@@ -430,5 +430,63 @@ var scheduleData = [
         "cycleName": "Cycle 34<br/>No HR | Late Start",
         "link": "https://www.dist113.org/cms/lib/IL01904711/Centricity/Domain/217/September%208%202023%20Late%20Start%20on%20Cycle%2012%20No%20HR.pdf"
       }, 5]
+  }, 
+  {
+    "startDate": "2024-09-16",
+    "endDate": "2024-09-20",
+    "weekSchedules": [
+      1,
+      2,
+      3,
+
+      {
+        "times": [
+          "7:15",
+          "8:05",
+          "8:10",
+          "9:02",
+          "9:07",
+          "9:52",
+          "9:57",
+          "10:49",
+          "10:54",
+          "11:44",
+          "11:49",
+          "12:40",
+          "12:29",
+          "13:20",
+          "13:25",
+          "14:17",
+          "14:23",
+          "15:14",
+          null,
+          null,
+          "11:14",
+          "11:44",
+          "11:49",
+          "12:24",
+          "12:20",
+          "12:50",
+          "12:45",
+          "13:20"
+        ],
+        "nums": [
+          "EB",
+          "1",
+          "HR",
+          "2",
+          "5",
+          "6-I",
+          "6-II",
+          "7",
+          "8",
+          null
+        ],
+        "cycleName": "Cycle 34<br/>Extended HR",
+        "h2": "Suicide Prevention Programs",
+        "link": "https://www.dist113.org/cms/lib/IL01904711/Centricity/Domain/217/September%2021%202023%20Extended%20HR%20Suicide%20Prevention%20Programming.pdf"
+      },
+      5
+    ]
   }
 ];
