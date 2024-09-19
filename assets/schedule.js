@@ -443,6 +443,7 @@ var scheduleData = [
         "times": [
           "7:15",
           "8:05",
+          null, null,
           "8:10",
           "9:02",
           "9:07",
@@ -472,6 +473,7 @@ var scheduleData = [
         ],
         "nums": [
           "EB",
+          null,
           "1",
           "HR",
           "2",
