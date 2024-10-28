@@ -502,5 +502,65 @@ var scheduleData = [
     "startDate": "2024-09-30",
     "endDate": "2024-10-04",
     "weekSchedules": [2,3,4,10,5]
+  },
+  {
+    "startDate": "2024-10-28",
+    "endDate": "2024-11-01",
+    "weekSchedules": [
+      1,
+      {
+        "times": [
+          "7:15",
+          "8:05",
+            null, null,
+          "8:10",
+          "9:00",
+          "9:05",
+          "9:55",
+          "10:05",
+          "10:55",
+          "11:00",
+          "11:50",
+          "11:55",
+          "12:45",
+          "12:34",
+          "13:24",
+          "13:29",
+          "14:19",
+          "14:24",
+          "15:14",
+          null,
+          null,
+          "11:20",
+          "11:50",
+          "11:55",
+          "12:30",
+          "12:25",
+          "12:55",
+          "12:49",
+          "13:24"
+        ],
+        "nums": [
+          "EB",
+            null,
+          "1",
+          "2-A",
+          "2-B",
+          "3",
+          "4-I",
+          "4-II",
+          "5",
+          "6",
+          null
+        ],
+        "cycleName": "Cycle 34<br>p2 Assembly",
+        "h2": "School Chest Kick-Off",
+        "link": "https://drive.google.com/file/d/1uQPNPKExRhlB2JjQ6FJEywf8isAKRvij/view",
+        "base": 0
+      },
+      3,
+      4,
+      5
+    ]
   }
 ];
