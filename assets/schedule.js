@@ -553,7 +553,7 @@ var scheduleData = [
           "6",
           null
         ],
-        "cycleName": "Cycle 34<br>p2 Assembly",
+        "cycleName": "Cycle 78<br>p2 Assembly",
         "h2": "School Chest Kick-Off",
         "link": "https://drive.google.com/file/d/1uQPNPKExRhlB2JjQ6FJEywf8isAKRvij/view",
         "base": 0
