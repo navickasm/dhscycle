@@ -11,9 +11,9 @@ window.SpecialSchedule = SpecialSchedule;
 
 var finalSchedule = {
   examDates: [
-    "May 28 2024",
-    "May 29 2024",
-    "May 30 2024"
+    "Dec 17 2024",
+    "Dec 18 2024",
+    "Dec 19 2024"
   ],
   examTimes: [
     "8:10",
@@ -23,7 +23,7 @@ var finalSchedule = {
     "13:10",
     "14:25"
   ],
-  periodSchedule: [8,7,6,5,4,3,2,1,9] // 9 == Make up
+  periodSchedule: [1,2,3,4,5,6,7,8,9] // 9 == Make up
 }
 
 var scheduleData = [
