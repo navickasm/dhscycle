@@ -680,6 +680,11 @@ var scheduleData = [
       "link": "https://drive.google.com/file/d/1jwhJhrtYEIKdKxjKqnN4iGTPlBwAlXIa/view",
       "h2": "Delayed Start Snow Day"
     }, 3,
-      { "times": ["7:15", "8:05",null, null, "8:10", "9:00", "9:05", "9:55", "10:00", "10:50", "10:55", "11:45", "11:34", "12:24", "12:29", "13:19", "13:29", "14:19","14:24","15:14", "10:20","10:50","10:55","11:29","11:26","11:56","11:50","12:24"], "nums": ["EB", null, "1", "2", "5", "6-I", "6-II", "7A", "7B", "8"], "cycleName": "Cycle 34<br>p.7 Split Assembly", "h2": "Fine Arts Assembly", "link": "https://drive.google.com/file/d/18wXIPwRWpjwiXXYMPj68czOsZO0dhFAf/view", "base": 0 }, 5]
+      { "times": ["7:15", "8:05",null, null,null,null, "8:10", "9:00", "9:05", "9:55", "10:00", "10:50", "10:55", "11:45", "11:34", "12:24", "12:29", "13:19", "13:29", "14:19","14:24","15:14", "10:20","10:50","10:55","11:29","11:26","11:56","11:50","12:24"], "nums": ["EB", null, null, "1", "2", "5", "6-I", "6-II", "7A", "7B", "8"], "cycleName": "Cycle 34<br>p.7 Split Assembly", "h2": "Fine Arts Assembly", "link": "https://drive.google.com/file/d/18wXIPwRWpjwiXXYMPj68czOsZO0dhFAf/view", "base": 0 }, 5]
+  },
+  {
+    "startDate": "2025-02-10",
+    "endDate": "2025-02-14",
+    "weekSchedules": [2,3,4,5,10]
   }
 ];
