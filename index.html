@@ -5,223 +5,123 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>DHS Bell Schedule</title>
+  <title>DHS Finals Schedule</title>
   <link rel="icon" type="image/x-icon" href="assets/favicon.png">
   <meta name="description" content="Better than Saturn">
   <link rel="stylesheet" href="web/style.css">
   <script src="./assets/schedule.js"></script>
-<!--  <script src="./web/finalsredirect.js"></script>-->
 </head>
 
 <body>
-  <div class="title" id="header">
-    <h1 id="title"></h1>
-    <h2 id="subtitle"></h2>
-  </div>
 
-  <div class="flexbox" id="informationbox">
-    <div class="schedulecontainer">
-      <table class="schedule" id="tableschedule">
-        <thead>
-          <tr>
-            <td colspan="3" id="cyclename" style="font-weight: bold;">Cycle LS</td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="se" id="se-0" colspan="3">
-              <div class="pcontainer">
-                <span class="pn" id="n0">EB*</span>
-                <span class="pt"><span id="t0">XX:xx</span>-<span id="t1">XX:xx</span></span>
-              </div>
-              <div id="lb0"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="se" id="se-1" colspan="3">
-              <div class="pcontainer">
-                <span class="pn" id="n1">HR</span>
-                <span class="pt"><span id="t2">XX:xx</span>-<span id="t3">XX:xx</span></span>
-              </div>
-              <div id="lb1"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="se" id="se-2" colspan="3">
-              <div class="pcontainer">
-                <span class="pn" id="n2">1</span>
-                <span class="pt"><span id="t4">XX:xx</span>-<span id="t5">XX:xx</span></span>
-              </div>
-              <div id="lb2"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="se" id="se-3" colspan="3">
-              <div class="pcontainer">
-                <span class="pn" id="n3">2</span>
-                <span class="pt"><span id="t6">XX:xx</span>-<span id="t7">XX:xx</span></span>
-              </div>
-              <div id="lb3"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="se" id="se-4" colspan="3">
-              <div class="pcontainer">
-                <span class="pn" id="n4">3</span>
-                <span class="pt"><span id="t8">XX:xx</span>-<span id="t9">XX:xx</span></span>
-              </div>
-              <div id="lb4"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="se-filler"></td>
-            <td class="se" id="se-5" colspan="2" rowspan="2">
-              <div class="pcontainer">
-                <span class="pn" id="n5">4</span>
-                <span class="pt"><span id="t10">XX:xx</span>-<wbr><span id="t11">XX:xx</span></span>
-              </div>
-              <div id="lb5"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="lunch se" id="se-11">
-              <span class="ln">Lunch A</span>
-              <span class="pt"><span id="t22">XX:xx</span>-<wbr><span id="t23">XX:xx</span></span>
-              <div id="lb11"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="lunch se" id="se-12">
-              <span class="ln">Lunch B</span>
-              <span class="pt"><span id="t24">XX:xx</span>-<wbr><span id="t25">XX:xx</span></span>
-              <div id="lb12"></div>
-            </td>
-            <td class="se-filler"></td>
-            <td class="se dash" id="se-6" rowspan="2">
-              <span class="pn" id="n6">5-I</span><br>
-              <span class="pt"><span id="t12">XX:xx</span>-<wbr><span id="t13">XX:xx</span></span>
-              <div id="lb6"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="lunch se" id="se-13">
-              <span class="ln">Lunch C</span>
-              <span class="pt"><span id="t26">XX:xx</span>-<wbr><span id="t27">XX:xx</span></span>
-              <div id="lb13"></div>
-            </td>
-            <td class="se dash" id="se-7" rowspan="2">
-              <span class="pn" id="n7">5-II</span><br>
-              <span class="pt"><span id="t14">XX:xx</span>-<wbr><span id="t15">XX:xx</span></span>
-              <div id="lb7"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="lunch se" id="se-14">
-              <span class="ln">Lunch D</span>
-              <span class="pt"><span id="t28">XX:xx</span>-<wbr><span id="t29">XX:xx</span></span>
-              <div id="lb14"></div>
-            </td>
-            <td class="se-filler"></td>
-          </tr>
-          <tr>
-            <td class="se" id="se-8" colspan="3">
-              <div class="pcontainer">
-                <span class="pn" id="n8">6</span>
-                <span class="pt"><span id="t16">XX:xx</span>-<span id="t17">XX:xx</span></span>
-              </div>
-              <div id="lb8"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="se" id="se-9" colspan="3">
-              <div class="pcontainer">
-                <span class="pn" id="n9">7</span>
-                <span class="pt"><span id="t18">XX:xx</span>-<span id="t19">XX:xx</span></span>
-              </div>
-              <div id="lb9"></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="se" id="se-10" colspan="3">
-              <div class="pcontainer">
-                <span class="pn" id="n10">8</span>
-                <span class="pt"><span id="t20">XX:xx</span>-<span id="t21">XX:xx</span></span>
-              </div>
-              <div id="lb10"></div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<div class="yap" style="text-align:center; background-color:#FFC7C7FF; outline-style: dashed; outline-color:var(--main); width:70vw; margin-left:auto; margin-right:auto; margin-top: 10px; margin-bottom: 10px; padding:3px;">
+  <h1>Senior Commitment Page!</h1>
+  <p>DHSCycle is excited to bring the Deerfield High School Class of 2026 its Instagram commitment page!</p>
+  <p>Follow today <a href="https://www.instagram.com/dhs2026seniors/">@dhs2026seniors</a>!</p>
+  <p>Good luck on finals, and check back when you get next year's schedule; we are implementing Saturn-like functionality so you can see your friends' classes!</p>
+  <p>-Mack</p>
+</div>
 
-    <table id="thisweektable" class="thisweek">
-      <thead>
-        <tr>
-          <th colspan="2">This Week's Schedule</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Monday</td>
-          <td><a id="tablelink1"><span id="tableday1">Cycle LS</span></a></td>
-        </tr>
-        <tr>
-          <td>Tuesday</td>
-          <td><a id="tablelink2"><span id="tableday2">Cycle 78</span></a></td>
-        </tr>
-        <tr>
-          <td>Wednesday</td>
-          <td><a id="tablelink3"><span id="tableday3">Cycle 56</span></a></td>
-        </tr>
-        <tr>
-          <td>Thursday</td>
-          <td><a id="tablelink4"><span id="tableday4">Cycle 34</span></a></td>
-        </tr>
-        <tr>
-          <td>Friday</td>
-          <td><a id="tablelink5"><span id="tableday5">Cycle 12</span></a></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <p id="ebnotif" class="hidden" style="text-align:center;">*EB Science Only</p>
+<div class="schedulecontainer">
+  <table class="finalschedule" id="tableschedule">
+    <thead>
+    <tr>
+      <td>Exam Time/Day</td>
+      <td style="width:23%"><b>Tuesday</b><br>May 27</td>
+      <td style="width:23%"><b>Wednesday</b><br>May 28</td>
+      <td style="width:23%"><b>Thursday</b><br>May 29</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td><span id="t0">X:xx</span> - <span id="t1">X:xx</span></td>
+      <td class="se" id="se-0">
+        <p><span id="n0">1</span></p>
+        <div id="lb0"></div>
+      </td>
+      <td class="se" id="se-3">
+        <p><span id="n3">4</span></p>
+        <div id="lb3"></div>
+      </td>
+      <td class="se" id="se-6">
+        <p><span id="n6">7</span></p>
+        <div id="lb6"></div>
+      </td>
+    </tr>
+    <tr>
+      <td><span id="t2">X:xx</span> - <span id="t3">X:xx</span></td>
+      <td class="se" id="se-1">
+        <p><span id="n1">2</span></p>
+        <div id="lb1"></div>
+      </td>
+      <td class="se" id="se-4">
+        <p><span id="n4">5</span></p>
+        <div id="lb4"></div>
+      </td>
+      <td class="se" id="se-7">
+        <p><span id="n7">8</span></p>
+        <div id="lb7"></div>
+      </td>
+    </tr>
+    <tr>
+      <td><span id="t4">X:xx</span> - <span id="t5">X:xx</span></td>
+      <td class="se" id="se-2">
+        <p><span id="n2">4</span></p>
+        <div id="lb2"></div>
+      </td>
+      <td class="se" id="se-5">
+        <p><span id="n5">6</span></p>
+        <div id="lb5"></div>
+      </td>
+      <td class="se" id="se-8">
+        <p><span id="n8">Make-up (E114)</span></p>
+        <div id="lb8"></div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
 
-  <div id="pdfschedulecontainer" class="hidden">
-    <iframe id="pdfschedule" src="./bell.html"></iframe>
-    <p style="text-align:center;font-style: italic;"><a href="./assets/bell.pdf">Or view the (actual) Bell Schedule</a>
-    </p>
-  </div>
+<p id="ebnotif" class="hidden" style="text-align:center;">*EB Science Only</p>
 
-  <p id="orview" style="text-align:center;font-style: italic;"><a href="./bell.html" id="orviewa">
-      <span id="orviewbs">Or view the Bell Schedule</span>
-      <span id="orviewss" class="hidden">Or view the Special Schedule</span>
-    </a></p>
+<div id="pdfschedulecontainer" class="hidden">
+  <iframe id="pdfschedule" src="./bell.html"></iframe>
+  <p style="text-align:center;font-style: italic;"><a href="./assets/bell.pdf">Or view the (actual) Bell Schedule</a>
+  </p>
+</div>
 
-  <div id="settings" style="text-align: center; margin-top: 10px; font-size: 10pt;">
-    <input type="checkbox" id="scrollTime" name="scrollTime">
-    <label for="scrollTime">Show elapsed time</label>
-  </div>
+<p id="orview" style="text-align:center;font-style: italic;"><a href="./bell.html" id="orviewa">
+  <span id="orviewbs">Or view the Bell Schedule</span>
+  <span id="orviewss" class="hidden">Or view the Special Schedule</span>
+</a></p>
 
-  <div class="footer" id="footer">
-    <p><a href="https://www.greatlakes.software" style="color:#000000"><span style="color:#3498db">Great Lakes</span> Software</a> |  <a href="color.html">Color Editor</a></p>
-  </div>
+
+
+<div id="settings" style="text-align: center; margin-top: 10px; font-size: 10pt;">
+  <input type="checkbox" id="scrollTime" name="scrollTime">
+  <label for="scrollTime">Show elapsed time</label>
+</div>
+
+<div class="footer" id="footer">
+  <p><a href="https://www.greatlakes.software" style="color:#000000"><span style="color:#3498db">Great Lakes</span> Software</a> |  <a href="color.html">Color Editor</a></p>
+</div>
 
   <div id="loadingscreen" class="loading">
     <div class="loader"></div>
     <p>Loading...</p>
   </div>
 
-  <script src="web/script.js"></script>
-  <script src="web/colorgetter.js"></script>
+<script src="web/finalsscript.js"></script>
+<script src="web/colorgetter.js"></script>
 
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZVW0CT8HLY"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {dataLayer.push(arguments);}
-    gtag('js', new Date());
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZVW0CT8HLY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-    gtag('config', 'G-ZVW0CT8HLY');
-  </script>
+  gtag('config', 'G-ZVW0CT8HLY');
+</script>
 
 </body>
 
