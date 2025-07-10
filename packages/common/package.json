@@ -1,0 +1,14 @@
+{
+  "name": "@dhscycle/common",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for DHS Cycle app",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build --verbose",
+    "watch": "tsc --build --verbose --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  }
+}

@@ -1,14 +1,14 @@
 {
-    "files": [
-        "src/index.ts"
-    ],
     "compilerOptions": {
-        "outDir": "./dist",
+        "outDir": "./packages/server/dist",
         "noImplicitAny": true,
         "module": "nodenext",
         "moduleResolution": "nodenext",
         "sourceMap": true,
-        "target": "es6",
+        "target": "es2017",
+        "skipLibCheck": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "typeRoots": [
             "node_modules/@types"
         ],
