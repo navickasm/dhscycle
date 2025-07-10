@@ -9,6 +9,7 @@ v1/
 
 # dependencies
 /node_modules
+/packages/*/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -21,7 +22,7 @@ v1/
 /coverage
 
 # next.js
-/.next/
+packages/client/.next/
 /out/
 
 # production
