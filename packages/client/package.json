@@ -6,22 +6,36 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "type": "module",
   "devDependencies": {
+    "@chromatic-com/storybook": "^4.0.1",
+    "@storybook/addon-a11y": "^9.0.16",
+    "@storybook/addon-docs": "^9.0.16",
+    "@storybook/addon-onboarding": "^9.0.16",
+    "@storybook/addon-vitest": "^9.0.16",
+    "@storybook/nextjs-vite": "^9.0.16",
+    "@types/node": "^20",
     "@types/react": "^19.1.8",
+    "@types/react-dom": "^19",
+    "@vitest/browser": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "html-webpack-plugin": "^5.6.0",
+    "playwright": "^1.54.1",
+    "storybook": "^9.0.16",
     "ts-loader": "^9.5.1",
     "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react-dom": "^19"
+    "vitest": "^3.2.4"
   },
   "dependencies": {
+    "@dhscycle/common": "1.0.0",
+    "@emotion/styled": "^11.14.1",
     "@mui/material": "^7.2.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.0.0",
     "next": "15.3.5",
-    "@dhscycle/common": "1.0.0"
+    "react": "^19.1.0",
+    "react-dom": "^19.0.0"
   }
 }
