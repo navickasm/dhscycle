@@ -18,6 +18,9 @@ export class GraphQLResolvers {
     }
 
     constructor() {
+        if (!process.env.DATABASE_URL) {
+            throw new Error("DATABASE_URL is not defined");
+        }
         this.db = new Sequelize(process.env.DATABASE_URL);
         this.db.addModels([ScheduleModel]);
         this.inited = false;

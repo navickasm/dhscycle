@@ -1,14 +1,14 @@
 {
     "compilerOptions": {
-        "outDir": "./packages/server/dist",
         "noImplicitAny": true,
         "module": "nodenext",
-        "moduleResolution": "nodenext",
         "sourceMap": true,
         "target": "es2017",
         "skipLibCheck": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
         "typeRoots": [
             "node_modules/@types"
         ],
@@ -19,6 +19,11 @@
         "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
         "incremental": true,
-        "allowUnreachableCode": false
+        "allowUnreachableCode": false,
+        "references": [
+            { "path": "./packages/common" },
+            { "path": "./packages/server" },
+            { "path": "./packages/client" }
+        ]
     }
 }
