@@ -1,2 +1,55 @@
-node_modules
-package-lock.json
+# Project-specific file
+v1/
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# dependencies
+/node_modules
+/packages/*/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+packages/client/.next/
+/out/
+
+# production
+/build
+/packages/*/dist
+
+# OS generated files
+.DS_Store
+Thumbs.db
+/generated/prisma
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+*storybook.log
+storybook-static

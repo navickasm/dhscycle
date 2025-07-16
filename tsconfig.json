@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "module": "nodenext",
+        "sourceMap": true,
+        "target": "es2017",
+        "skipLibCheck": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
+        "typeRoots": [
+            "node_modules/@types"
+        ],
+        "lib": [
+            "es2017"
+        ],
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "incremental": true,
+        "allowUnreachableCode": false,
+        "references": [
+            { "path": "./packages/common" },
+            { "path": "./packages/server" },
+            { "path": "./packages/client" }
+        ]
+    }
+}

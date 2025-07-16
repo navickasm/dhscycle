@@ -1,14 +1,25 @@
 {
   "name": "dhscycle",
+  "private": true,
   "version": "1.0.0",
-  "main": "preview.js",
+  "description": "Scheduling app for high school",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepare": "husky install",
+    "pretty": "prettier --write packages/server",
+    "build": "npm run build -w packages/server && npm run build -w packages/client",
+    "dev": "npm run dev -w packages/server & npm run dev -w packages/client",
+    "start": "npm run start -w packages/server"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.18.2",
-    "http": "^0.0.1-security"
-  }
+  "type": "module",
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.7",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.3"
+  },
+  "workspaces": [
+    "packages/server",
+    "packages/client",
+    "packages/common"
+  ]
 }

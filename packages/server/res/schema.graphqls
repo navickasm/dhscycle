@@ -1,0 +1,17 @@
+type Query {
+    todaySchedule: Schedule!
+}
+
+type Schedule {
+    date: String!
+    scheduleName: String!
+    scheduleH2: String!
+    periods: [Period!]!
+}
+
+type Period {
+    period: Int!
+    periodName: String!
+    startingTime: String!
+    endingTime: String!
+}
