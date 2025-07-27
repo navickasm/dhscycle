@@ -13,7 +13,8 @@
       "node_modules/@types"
     ],
     "lib": [
-      "es2017"
+      "es2017",
+      "dom"
     ],
     "allowJs": true,
     "strict": true,
@@ -36,10 +37,11 @@
     "moduleResolution": "node"
   },
   "include": [
-    "./next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    "./next-env.d.ts",
+    ".next/types/**/*.ts",
+    "dist/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
