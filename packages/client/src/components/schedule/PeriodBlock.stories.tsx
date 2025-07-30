@@ -13,8 +13,9 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     period: {
-      name: "3",
-      time: "10:00 - 10:45"
+      period: "EB",
+      start: "07:14",
+      end: "08:35"
     },
     index: 1
   }
