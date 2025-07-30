@@ -1,0 +1,80 @@
+[
+  {
+    "period": "EB",
+    "start": "07:14",
+    "end": "08:35"
+  },
+  {
+    "period": "1",
+    "start": "08:40",
+    "end": "09:20"
+  },
+  {
+    "period": "2",
+    "start": "09:25",
+    "end": "10:05"
+  },
+  {
+    "period": "3",
+    "start": "10:10",
+    "end": "10:50"
+  },
+  {
+    "lunchBlock": true,
+    "type": "normal",
+    "periods": [
+      {
+        "period": "4A",
+        "start": "10:55",
+        "end": "11:35"
+      },
+      {
+        "period": "4B",
+        "start": "11:30",
+        "end": "12:10"
+      },
+      {
+        "period": "5A",
+        "start": "11:40",
+        "end": "12:20"
+      },
+      {
+        "period": "5B",
+        "start": "12:15",
+        "end": "12:55"
+      }
+    ],
+    "lunches": [
+      {
+        "period": "L1",
+        "start": "10:55",
+        "end": "11:25"
+      },
+      {
+        "period": "L2",
+        "start": "11:40",
+        "end": "12:10"
+      },
+      {
+        "period": "L3",
+        "start": "12:25",
+        "end": "12:55"
+      }
+    ]
+  },
+  {
+    "period": "6",
+    "start": "13:00",
+    "end": "13:40"
+  },
+  {
+    "period": "7",
+    "start": "13:45",
+    "end": "14:25"
+  },
+  {
+    "period": "8",
+    "start": "14:30",
+    "end": "15:10"
+  }
+]

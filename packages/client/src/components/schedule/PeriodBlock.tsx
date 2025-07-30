@@ -2,8 +2,9 @@ import { Paper, Typography } from '@mui/material';
 
 interface PeriodBlockProps {
     period: {
-        name: string;
-        time: string;
+        period: string;
+        start: string;
+        end: string;
     };
     index: number;
 }
@@ -25,11 +26,11 @@ export default function PeriodBlock(p: PeriodBlockProps) {
             }}
         >
             <Typography variant="h6" fontWeight="medium" color="text.primary" sx={{ lineHeight: 1 }}>
-                {p.period.name}
+                {p.period.period}
             </Typography>
 
             <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1 }}>
-                {p.period.time}
+                {p.period.start} {'\u2013'} {p.period.end}
             </Typography>
         </Paper>
     );
