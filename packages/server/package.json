@@ -30,6 +30,7 @@
     "sqlite3": "^5.1.7",
     "cors": "^2.8.5",
     "graphql-config": "^5.1.5",
+    "express-rate-limit": "^8.0.1",
     "@dhscycle/common": "1.0.0"
   }
 }

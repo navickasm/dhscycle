@@ -11,13 +11,31 @@ const scheduleCache: ScheduleCache = {
     timestamp: null
 };
 
+function getCentralTimeDateString(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone: 'America/Chicago'
+    };
+    const formatter = new Intl.DateTimeFormat('en-US', options);
+    const parts = formatter.formatToParts(date);
+    let year = '';
+    let month = '';
+    let day = '';
+    for (const part of parts) {
+        if (part.type === 'year') year = part.value;
+        if (part.type === 'month') month = part.value;
+        if (part.type === 'day') day = part.value;
+    }
+    return `${year}-${month}-${day}`;
+}
+
 function isCacheValid(): boolean {
     if (scheduleCache.schedule === null || scheduleCache.timestamp === null) return false;
-    const today = new Date();
-    const cachedDate = new Date(scheduleCache.timestamp);
-    today.setHours(0, 0, 0, 0);
-    cachedDate.setHours(0, 0, 0, 0);
-    return cachedDate.getTime() === today.getTime();
+    const currentCentralDayStr = getCentralTimeDateString(new Date());
+    const cachedDateCentralDayStr = getCentralTimeDateString(scheduleCache.timestamp);
+    return cachedDateCentralDayStr === currentCentralDayStr;
 }
 
 function invalidateCache(): void {
@@ -41,7 +59,8 @@ async function fetchScheduleFromDb(dateStr: string): Promise<string | null> {
                     END AS schedule_json
             FROM schedules s
             WHERE s.date = ?;`,
-            [dateStr]);
+            [dateStr]
+        );
 
         if (row && row.schedule_json) {
             let scheduleData = row.schedule_json;
@@ -64,37 +83,58 @@ async function fetchScheduleFromDb(dateStr: string): Promise<string | null> {
     }
 }
 
-async function getBellScheduleForDate(dateStr: string): Promise<string> {
-    if (isCacheValid()) {
-        const cachedDate = scheduleCache.timestamp!.toISOString().split('T')[0];
-        if (cachedDate === dateStr) {
+async function getBellScheduleForDate(dateStr: string, useCacheForCurrentDay: boolean = false): Promise<string> {
+    const todayDateStr = getCentralTimeDateString(new Date());
+
+    if (useCacheForCurrentDay && dateStr === todayDateStr) {
+        if (isCacheValid()) {
             console.log(`Serving schedule for ${dateStr} from cache.`);
             return scheduleCache.schedule!;
+        } else {
+            console.log(`Cache invalid or expired for ${dateStr}. Fetching new schedule for current day.`);
+            const scheduleJson = await fetchScheduleFromDb(dateStr);
+
+            if (scheduleJson) {
+                scheduleCache.schedule = scheduleJson;
+                scheduleCache.timestamp = new Date();
+                console.log(`Cache updated with schedule JSON string for ${dateStr}.`);
+            } else {
+                console.log(`No schedule found for ${dateStr} in the database. Caching empty JSON array for current day.`);
+                scheduleCache.schedule = '[]';
+                scheduleCache.timestamp = new Date();
+            }
+
+            return scheduleCache.schedule!;
         }
-    }
-
-    console.log(`Cache invalid or expired for ${dateStr}. Fetching new schedule.`);
-    const scheduleJson = await fetchScheduleFromDb(dateStr);
-
-    if (scheduleJson) {
-        scheduleCache.schedule = scheduleJson;
-        scheduleCache.timestamp = new Date();
-        console.log(`Cache updated with schedule JSON string for ${dateStr}.`);
     } else {
-        console.log(`No schedule found for ${dateStr} in the database. Caching empty JSON array.`);
-        scheduleCache.schedule = '[]';
-        scheduleCache.timestamp = new Date();
+        console.log(`Fetching schedule for ${dateStr} directly from DB (not current day or cache bypassed).`);
+        const scheduleJson = await fetchScheduleFromDb(dateStr);
+        return scheduleJson || '[]';
     }
-
-    return scheduleCache.schedule!;
 }
 
 const router = Router();
 
-router.get('/currentDay', async (req, res) => {
+router.get('/schedule/currentDay', async (req, res) => {
     try {
-        const todayDateStr = new Date().toISOString().split('T')[0];
-        const scheduleJsonString = await getBellScheduleForDate(todayDateStr);
+        const todayDateStr = getCentralTimeDateString(new Date());
+        const scheduleJsonString = await getBellScheduleForDate(todayDateStr, true);
+        const scheduleObject = JSON.parse(scheduleJsonString);
+        return res.json(scheduleObject);
+    } catch (error) {
+        console.error('Error in /api/schedule/currentDay:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+router.get('/schedule', async (req, res) => {
+    try {
+        const requestedDateStr = req.query.date as string;
+
+        if (!requestedDateStr) {
+            return res.status(400).json({ message: 'Date query parameter is required (e.g., ?date=YYYY-MM-DD).' });
+        }
+        const scheduleJsonString = await getBellScheduleForDate(requestedDateStr, false);
         const scheduleObject = JSON.parse(scheduleJsonString);
         return res.json(scheduleObject);
     } catch (error) {

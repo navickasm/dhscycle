@@ -2,6 +2,7 @@ import {readFile} from 'fs/promises';
 import Express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import rateLimit from "express-rate-limit";
 
 import scheduleApiRouter from '@/routes/scheduleApi.js';
 import {closeDatabase, initializeDatabase} from "@/database.js";
@@ -20,6 +21,13 @@ app.use(cors({
 }));
 
 app.use(scheduleApiRouter);
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+});
+
+app.use(limiter);
 
 app.listen(4000);
 
