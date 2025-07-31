@@ -15,11 +15,6 @@ initializeDatabase().then(r => {
     console.log("Database initialized successfully");
 })
 
-app.use(cors({
-    origin: 'https://studio.apollographql.com',
-    credentials: true,
-}));
-
 const limiter = rateLimit({
     windowMs: 1000 * 3,
     max: 5,
