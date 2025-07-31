@@ -20,14 +20,14 @@ app.use(cors({
     credentials: true,
 }));
 
-app.use(scheduleApiRouter);
-
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 1000 * 3,
     max: 5,
 });
 
 app.use(limiter);
+
+app.use(scheduleApiRouter);
 
 app.listen(4000);
 
