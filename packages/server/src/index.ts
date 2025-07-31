@@ -1,7 +1,6 @@
-import {readFile} from 'fs/promises';
+
 import Express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
 import rateLimit from "express-rate-limit";
 
 import scheduleApiRouter from '@/routes/scheduleApi.js';
@@ -23,6 +22,10 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.use(scheduleApiRouter);
+
+app.use((req, res) => {
+    res.status(501).send();
+});
 
 app.listen(4000);
 
