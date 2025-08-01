@@ -5,10 +5,20 @@ interface ScheduleCache {
     timestamp: Date | null;
 }
 
-const scheduleCache: ScheduleCache = {
-    schedule: null,
-    timestamp: null
-};
+const scheduleCache: ScheduleCache = (() => {
+    let _schedule: string | null = null;
+
+    return {
+        get schedule() {
+            return _schedule;
+        },
+        set schedule(value: string | null) {
+            _schedule = value;
+            this.timestamp = value ? new Date(Date.now()) : null;
+        },
+        timestamp: null
+    };
+})();
 
 function isCacheValid(): boolean {
     if (scheduleCache.schedule === null || scheduleCache.timestamp === null) return false;
