@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getCentralTimeDateString } from '@/lib/utils.js';
-import { scheduleCache, isCacheValid } from '@/cache.js';
-import { fetchScheduleFromDb } from '@/service/scheduleService.js';
+import { getCentralTimeDateString } from '../lib/utils.js';
+import { scheduleCache, isCacheValid } from '../cache.js';
+import { fetchScheduleFromDb } from '../service/scheduleService.js';
 
 async function getBellScheduleForDate(dateStr: string, useCacheForCurrentDay: boolean = false): Promise<string> {
     const todayDateStr = getCentralTimeDateString(new Date());

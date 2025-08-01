@@ -1,4 +1,4 @@
-import {getDbGet} from "@/database.js";
+import {getDbGet} from "../database.js";
 
 async function fetchScheduleFromDb(dateStr: string): Promise<string | null> {
     try {

@@ -1,4 +1,4 @@
-import { getCentralTimeDateString } from '@/lib/utils.js';
+import { getCentralTimeDateString } from './lib/utils.js';
 
 interface ScheduleCache {
     schedule: string | null;

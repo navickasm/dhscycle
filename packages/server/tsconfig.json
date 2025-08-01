@@ -4,6 +4,7 @@
     "moduleResolution": "nodenext",
     "target": "es2017",
     "lib": ["es2017", "dom"],
+    "baseUrl": "./",
     "rootDir": "./src",
     "outDir": "./dist",
     "sourceMap": true,
@@ -21,9 +22,6 @@
     "skipLibCheck": true,
     "typeRoots": ["../node_modules/@types", "./types", "./node_modules/@types"],
     "jsx": "react-jsx",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
   },
   "include": [
     "**/*.ts"
