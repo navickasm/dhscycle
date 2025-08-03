@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getCentralTimeDateString } from '../lib/utils.js';
+import { getCentralTimeDateString } from '../utils.js';
 import { scheduleCache, isCacheValid } from '../cache.js';
-import { fetchScheduleFromDb } from '../service/scheduleService.js';
+import { fetchScheduleFromDb } from '../service.js';
 
 async function getBellScheduleForDate(dateStr: string): Promise<any> {
     const todayDateStr = getCentralTimeDateString(new Date());
@@ -39,7 +39,7 @@ router.get('/schedule/currentDay', async (req, res) => {
         const schedule = await getBellScheduleForDate(todayDateStr);
         return res.json(schedule);
     } catch (error) {
-        console.error('Error in /api/schedule/currentDay:', error);
+        console.error('Error in /schedule/currentDay:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 });

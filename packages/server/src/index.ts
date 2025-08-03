@@ -4,7 +4,7 @@ import Express from 'express';
 import dotenv from 'dotenv';
 import rateLimit from "express-rate-limit";
 
-import scheduleApiRouter from './routes/scheduleApi.js';
+import scheduleApiRouter from './routes/schedule.js';
 import {closeDatabase, initializeDatabase} from "./database.js";
 
 dotenv.config();
