@@ -1,8 +1,9 @@
 import {Router} from 'express';
 import {getCentralTimeDateString} from '../utils.js';
 import {isCacheValid, scheduleCache} from '../cache.js';
-import {fetchScheduleFromDb} from '../service.js';
+import {fetchScheduleFromDb, fetchWeekNamesFromDb} from '../service.js';
 
+// TODO review this logic
 async function getBellScheduleForDate(dateStr: string): Promise<any> {
     const todayDateStr = getCentralTimeDateString(new Date());
 
@@ -14,10 +15,11 @@ async function getBellScheduleForDate(dateStr: string): Promise<any> {
     const scheduleJson = await fetchScheduleFromDb(dateStr);
 
     if (dateStr === todayDateStr) {
-        scheduleCache.schedule = scheduleJson;
+        scheduleCache.schedule = JSON.parse(scheduleJson || '{}');
+        return scheduleCache.schedule;
     }
 
-    return JSON.parse(scheduleJson || '{"noSchool": true, "reason": "NO_SCHEDULE_DATA"}');
+    return JSON.parse(scheduleJson || '{}');
 }
 
 const router = Router();
@@ -42,6 +44,17 @@ router.get('/schedule/:date', async (req, res) => {
         }
         const schedule = await getBellScheduleForDate(requestedDateStr);
         return res.json(schedule);
+    } catch (error) {
+        console.error('Error in /schedule/:date:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+router.get('/thisWeek', async (req, res) => {
+    try {
+        const names = await fetchWeekNamesFromDb(getCentralTimeDateString(new Date()));
+        console.log(names);
+        return res.json(names);
     } catch (error) {
         console.error('Error in /schedule/:date:', error);
         return res.status(500).json({ message: 'Internal Server Error' });

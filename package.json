@@ -23,5 +23,8 @@
     "packages/server",
     "packages/client",
     "packages/common"
-  ]
+  ],
+  "dependencies": {
+    "cors": "^2.8.5"
+  }
 }

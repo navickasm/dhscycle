@@ -1,0 +1,55 @@
+import React, { useState, useEffect } from 'react';
+
+interface TimerProps {
+    start: string;
+    end: string;
+}
+
+const Timer: React.FC<TimerProps> = ({ start, end }) => {
+    const [background, setBackground] = useState<string>('rgb(255, 255, 255)');
+
+    // TODO make this work for CT
+    useEffect(() => {
+        const updateProgress = () => {
+            const now = new Date();
+            const [startHours, startMinutes] = start.split(':').map(Number);
+            const [endHours, endMinutes] = end.split(':').map(Number);
+
+            const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHours, startMinutes, 0);
+            const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endHours, endMinutes, 0);
+
+            const totalDuration = endTime.getTime() - startTime.getTime();
+            const elapsedDuration = now.getTime() - startTime.getTime();
+
+            const progressPercentage = Math.min(100, Math.max(0, (elapsedDuration / totalDuration) * 100));
+
+            setBackground(
+                progressPercentage >= 100 || progressPercentage <= 0
+                    ? ""
+                    : `linear-gradient(to bottom, var(--main) ${progressPercentage}%, var(--light) ${progressPercentage}%)`
+            );
+        };
+
+        updateProgress();
+        const intervalId = setInterval(updateProgress, 1000); // Update every second
+
+        return () => clearInterval(intervalId);
+    }, [start, end]);
+
+    return (
+        <div
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: background,
+                zIndex: 0,
+                transition: 'background 0.5s ease-out',
+            }}
+        />
+    );
+};
+
+export default Timer;

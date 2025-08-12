@@ -30,6 +30,7 @@ function promisifyDbMethod(db: Database, methodName: string): (...args: any[]) =
 }
 
 let dbGet: ((sql: string, params?: any[]) => Promise<any>) | null = null;
+let dbAll: ((sql: string, params?: any[]) => Promise<any[]>) | null = null;
 let dbRun: ((sql: string, params?: any[]) => Promise<{ lastID: number, changes: number }>) | null = null;
 let dbExec: ((sql: string) => Promise<{ lastID: number, changes: number }>) | null = null;
 
@@ -49,6 +50,7 @@ export async function initializeDatabase(): Promise<Database> {
             console.log('Connected to the SQLite database.');
 
             dbGet = promisifyDbMethod(dbInstance!, 'get');
+            dbAll = promisifyDbMethod(dbInstance!, 'all');
             dbRun = promisifyDbMethod(dbInstance!, 'run');
             dbExec = promisifyDbMethod(dbInstance!, 'exec');
 
@@ -69,6 +71,13 @@ export function getDbGet(): (sql: string, params?: any[]) => Promise<any> {
         throw new Error('Database methods not initialized. Call initializeDatabase() first.');
     }
     return dbGet;
+}
+
+export function getDbAll(): (sql: string, params?: any[]) => Promise<any[]> {
+    if (!dbAll) {
+        throw new Error('Database methods not initialized. Call initializeDatabase() first.');
+    }
+    return dbAll;
 }
 
 export function getDbRun(): (sql: string, params?: any[]) => Promise<{ lastID: number, changes: number }> {
@@ -96,6 +105,7 @@ export async function closeDatabase(): Promise<void> {
                 console.log('Database connection closed.');
                 dbInstance = null;
                 dbGet = null;
+                dbAll = null;
                 dbRun = null;
                 dbExec = null;
                 resolve();

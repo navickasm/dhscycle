@@ -1,42 +1,107 @@
-import { DateTime } from 'luxon';
-import {getDbExec, getDbGet, getDbRun} from "./database.js";
+import {DateTime} from 'luxon';
+import {getDbAll, getDbGet, getDbRun} from "./database.js";
 
-export async function fetchScheduleFromDb(dateStr: string): Promise<string | null> {
+export async function fetchWeekNamesFromDb(dateStr: string): Promise<{
+    scheduleName: any;
+    day: string | "Invalid DateTime"
+}[]> {
+    const dbAll = getDbAll();
+
+    if (!dateStr) return Promise.reject(new Error("Date string is required."));
+
     try {
-        const dbGet = getDbGet();
-        const row = await dbGet(
-            `SELECT
-                CASE
-                    WHEN s.regularity != 'special'
+        const weekStart = DateTime.fromISO(dateStr).startOf('week').toISODate();
+        const weekEnd = DateTime.fromISO(dateStr).endOf('week').toISODate();
+
+        console.log(weekStart + " " + weekEnd);
+        const sql = `SELECT DISTINCT
+            s.date,
+            CASE
+                WHEN s.regularity != 'special'
                     THEN (
-                        SELECT rs.schedule_json
+                        SELECT rs.name
                         FROM regular_schedules rs
                         WHERE rs.regularity = s.regularity
                     )
-                    END AS schedule_json
-            FROM schedules s
-            WHERE s.date = ?;`,
+                ELSE s.special_schedule_name
+            END AS schedule_name
+        FROM schedules s
+        WHERE s.date BETWEEN '${weekStart}' AND '${weekEnd}';`;
+
+        const rows = await dbAll(sql);
+
+        return Array.from({length: 5}, (_, i) => {
+            const currentDate = DateTime.fromISO(weekStart!).plus({days: i});
+            const dayOfWeek = currentDate.toFormat('cccc');
+            const entry = rows.find(row => row.date === currentDate.toISODate());
+            return entry
+                ? {day: dayOfWeek, scheduleName: entry.schedule_name}
+                : {day: dayOfWeek, scheduleName: "No School"};
+        });
+    } catch (err) {
+        return Promise.reject(new Error(`Error fetching week schedule names for ${dateStr}: ${err}`));
+    }
+}
+
+export async function fetchScheduleFromDb(dateStr: string): Promise<string | null> {
+    const dbGet = getDbGet();
+
+    if (!dateStr || !DateTime.fromISO(dateStr).isValid) return Promise.reject(new Error("Valid ISO date string is required."));
+
+    try {
+        const row = await dbGet(
+            `SELECT
+                schedule_json,
+                special_schedule_name,
+                special_schedule_h2
+            FROM (
+                SELECT
+                    CASE
+                        WHEN s.regularity != 'special'
+                            THEN (
+                                SELECT rs.schedule_json
+                                FROM regular_schedules rs
+                                WHERE rs.regularity = s.regularity
+                            )
+                        ELSE s.schedule_json
+                    END AS schedule_json,
+                    CASE
+                        WHEN s.regularity != 'special'
+                            THEN (
+                                SELECT rs.name
+                                FROM regular_schedules rs
+                                WHERE rs.regularity = s.regularity
+                            )
+                        ELSE s.special_schedule_name
+                    END AS special_schedule_name,
+                    CASE
+                        WHEN s.regularity != 'special'
+                            THEN NULL
+                        ELSE s.special_schedule_h2
+                    END AS special_schedule_h2
+                FROM schedules s
+                WHERE s.date = ?
+            );`,
             [dateStr]
         );
 
-        if (row && row.schedule_json) {
-            let scheduleData = row.schedule_json;
+        if (!row || !row.schedule_json) return JSON.stringify({noSchool: true, reason: "NO_SCHEDULE_DATA"});
 
-            if (typeof scheduleData === 'string') {
-                try {
-                    const unescapedString = scheduleData.replace(/\\"/g, '"');
-                    const parsed = JSON.parse(unescapedString);
-                    return JSON.stringify(parsed);
-                } catch (secondParseError) {
-                    console.error(`Invalid JSON string from DB for ${dateStr}`, scheduleData, secondParseError);
-                    return null;
-                }
+        const scheduleData: string = row.schedule_json;
+
+        try {
+            const parsedTimes = JSON.parse(scheduleData.replace(/\\"/g, '"'));
+            const fullSchedule = {
+                name: row.special_schedule_name,
+                h2: row.special_schedule_h2 || null,
+                times: parsedTimes
             }
+            return JSON.stringify(fullSchedule);
+        } catch (err: unknown) {
+            return Promise.reject(new Error(`Invalid JSON string from DB for ${dateStr}: ${err}`));
         }
-        return null;
-    } catch (error) {
-        console.error(`Error fetching schedule for ${dateStr} from DB:`, error);
-        return null;
+    } catch (err) {
+        return Promise.reject(new Error(`Error fetching schedule for ${dateStr} from DB: ${err}`));
     }
 }
 
