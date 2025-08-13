@@ -3,11 +3,11 @@ import fs from 'fs';
 import path from 'path';
 import {readFile} from "fs/promises";
 
-const dbPath = path.join(import.meta.dirname, '../res/schedule.db');
+const dbPath = path.join(path.dirname(new URL(import.meta.url).pathname), '../res/schedule.db');
 if (!fs.existsSync(dbPath)) {
     fs.writeFileSync(dbPath, '');
 }
-const db = new sqlite3.Database(await readFile(dbPath, "utf-8"));
+const db = new sqlite3.Database(dbPath);
 
 const migrationsDir = path.join(path.dirname(new URL(import.meta.url).pathname), '../res/migrations');
 

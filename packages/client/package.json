@@ -32,11 +32,6 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@dhscycle/common": "1.0.0",
-    "@emotion/styled": "^11.14.1",
-    "@fontsource/anton": "^5.2.6",
-    "@mui/material": "^7.2.0",
-    "@mui/material-nextjs": "^7.2.0",
     "next": "15.3.5",
     "react": "^19.1.0",
     "react-dom": "^19.0.0",

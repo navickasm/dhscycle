@@ -1,37 +1,62 @@
-import { Paper, Typography } from '@mui/material';
+import Timer from "./Timer.tsx"
+import styles from "../schedule.module.css";
+import {JSX} from "react";
+import {durationToString} from "next/dist/build/duration-to-string";
 
-interface PeriodBlockProps {
+export interface PeriodBlockProps {
     period: {
         period: string;
         start: string;
         end: string;
     };
-    index: number;
+    type?: "normal" | "vertical" | "big" | "horiz";
 }
 
-export default function PeriodBlock(p: PeriodBlockProps) {
-    return (
-        <Paper
-            elevation={2}
-            sx={{
-                padding: 1,
-                textAlign: 'center',
-                width: '240px',
-                height: '40px',
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                mx: 'auto',
-            }}
-        >
-            <Typography variant="h6" fontWeight="medium" color="text.primary" sx={{ lineHeight: 1 }}>
-                {p.period.period}
-            </Typography>
+function to12Hr(time24: string): string {
+    const [hours, minutes] = time24.split(":").map(Number);
+    return `${hours % 12 || 12}:${minutes.toString().padStart(2, "0")}`;
+}
 
-            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1 }}>
-                {p.period.start} {'\u2013'} {p.period.end}
-            </Typography>
-        </Paper>
+export function preferredPeriodName(period: string): JSX.Element {
+    if (period === "SC") {
+        return <span className={styles.pn} style={{ fontSize: "14pt", lineHeight: "1.0", display: "inline-block" }}>Staff Collab</span>;
+    } else if (period == "FO") {
+        return <span className={styles.pn} style={{ fontSize: "14pt", lineHeight: "1.0", display: "inline-block" }}>Orientation</span>;
+    }
+    if (period.substring(0,1) == "L") {
+        return <span className={styles.ln}>Lunch {period.substring(1)}</span>;
+    }
+    return <span className={styles.pn}>{period}</span>;
+}
+
+export function PeriodBlockContent(p: PeriodBlockProps): JSX.Element {
+    return (
+        <td colSpan={p.type === "vertical" ? 1 : p.type === "big" ? 2 : p.type === "horiz" ? 2 : 3}
+            rowSpan={p.type === "vertical" ? 2 : p.type === "big" ? 2 : p.type === "horiz" ? 1 : 1}
+            height={p.type == "vertical" ? 120 : p.type === "big" ? 120 : undefined}>
+            <Timer start={p.period.start} end={p.period.end} />
+            <div style={{
+                display: "flex",
+                flexDirection: p.type === "vertical" ? "column" : "row",
+                justifyContent: p.type === "vertical" ? "center" : "space-between",
+                alignItems: "center",
+                position: "relative"
+            }}>
+                <div>
+                    {preferredPeriodName(p.period.period)}
+                </div>
+                <span className={styles.pt} style={p.type === "vertical" ? { marginTop: "8px" } : undefined}>
+                    {to12Hr(p.period.start)}–{ (p.type === "vertical" || p.type === "big") && (<br/>)}{to12Hr(p.period.end)}
+                </span>
+            </div>
+        </td>
+    );
+}
+
+export default function PeriodBlock(p: PeriodBlockProps): JSX.Element {
+    return (
+        <tr>
+            {PeriodBlockContent(p)}
+        </tr>
     );
 }
