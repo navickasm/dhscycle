@@ -24,10 +24,10 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Install root dependencies (for husky)
-        run: npm ci
-      - name: Install client dependencies
         run: npm ci
-        working-directory: packages/client
+      - name: Install client dependencies
+        run: npm ci
+        working-directory: packages/client
       - name: Build with Next.js
         run: NODE_ENV=production npx --no-install next build
         working-directory: packages/client
