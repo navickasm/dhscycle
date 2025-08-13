@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "description": "Scheduling app for high school",
   "scripts": {
-    "prepare": "husky install",
     "pretty": "prettier --write packages/server",
     "build": "npm run build -w packages/server && npm run build -w packages/client",
     "dev": "npm run dev -w packages/server & npm run dev -w packages/client",
@@ -14,7 +13,6 @@
   "type": "module",
   "devDependencies": {
     "@types/react": "^19.1.8",
-    "husky": "^9.0.11",
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.3",
     "typescript": "^5.5.3"
