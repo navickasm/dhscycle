@@ -96,8 +96,10 @@ export default function Home() {
                 <div style={{display: "flex",
                     gap: "20px",
                     alignItems: "flex-start",
-                    justifyContent: "center"}}>
-                    <Table schedule={schedule || {name: "", h2: "", times: []}}/>
+                    justifyContent: "center",
+                    flexWrap: "wrap"
+                }}>
+                    {schedule && <Table schedule={schedule} />}
                     <ThisWeek schedule={thisWeek || []}/>
                 </div>
             </main>

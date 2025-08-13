@@ -20,6 +20,8 @@ function to12Hr(time24: string): string {
 export function preferredPeriodName(period: string): JSX.Element {
     if (period === "SC") {
         return <span className={styles.pn} style={{ fontSize: "14pt", lineHeight: "1.0", display: "inline-block" }}>Staff Collab</span>;
+    } else if (period == "FO") {
+        return <span className={styles.pn} style={{ fontSize: "14pt", lineHeight: "1.0", display: "inline-block" }}>Orientation</span>;
     }
     if (period.substring(0,1) == "L") {
         return <span className={styles.ln}>Lunch {period.substring(1)}</span>;
