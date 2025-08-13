@@ -1,0 +1,7 @@
+CREATE TABLE analytics (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    value INTEGER NOT NULL DEFAULT 0,
+    UNIQUE (name, date)
+);

@@ -50,14 +50,12 @@ export default function Home() {
     useEffect(() => {
         const fetchSchedule = async () => {
             try {
-                const scheduleResponse = await fetch(`https://api.dhscycle.com/schedule/${date.toISOString().split('T')[0]}`); // Format date for URL
+                const scheduleResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com'}/schedule/${date.toISOString().split('T')[0]}`); // Format date for URL
                 if (!scheduleResponse.ok) {
                     throw new Error(`HTTP error! status: ${scheduleResponse.status}`);
                 }
 
                 const scheduleData: Schedule = await scheduleResponse.json();
-
-                console.log(scheduleData)
 
                 if (scheduleData.noSchool) {
                     setH2(scheduleData.reason && scheduleData.reason !== 'NO_SCHEDULE_DATA' ? `No School: ${scheduleData.reason}` : "No School");
@@ -71,7 +69,7 @@ export default function Home() {
 
                 setSchedule(scheduleData);
 
-                const thisWeekResponse = await fetch(`https://api.dhscycle.com/thisWeek`);
+                const thisWeekResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com'}/thisWeek`);
                 if (!thisWeekResponse.ok) {
                     throw new Error(`HTTP error! status: ${thisWeekResponse.status}`);
                 }

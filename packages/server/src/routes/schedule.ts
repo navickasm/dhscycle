@@ -1,7 +1,9 @@
 import {Router} from 'express';
 import {getCentralTimeDateString} from '../utils.js';
 import {isCacheValid, scheduleCache} from '../cache.js';
-import {fetchScheduleFromDb, fetchWeekNamesFromDb} from '../service.js';
+import {fetchScheduleFromDb, fetchWeekNamesFromDb, incrementCounter} from '../service.js';
+import fs from "fs";
+import path from "path";
 
 // TODO review this logic
 async function getBellScheduleForDate(dateStr: string): Promise<any> {
@@ -37,6 +39,8 @@ router.get('/schedule/currentDay', async (req, res) => {
 
 router.get('/schedule/:date', async (req, res) => {
     try {
+        await incrementCounter();
+
         const requestedDateStr = req.params.date;
 
         if (!requestedDateStr) {
@@ -53,7 +57,6 @@ router.get('/schedule/:date', async (req, res) => {
 router.get('/thisWeek', async (req, res) => {
     try {
         const names = await fetchWeekNamesFromDb(getCentralTimeDateString(new Date()));
-        console.log(names);
         return res.json(names);
     } catch (error) {
         console.error('Error in /schedule/:date:', error);
