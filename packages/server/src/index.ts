@@ -16,7 +16,9 @@ const app = Express();
 const allowedOrigins = [
     'http://localhost:3000',
     'https://www.dhscycle.com',
-    'http://www.dhscycle.com'
+    'http://www.dhscycle.com',
+    'https://dhscycle.com',
+    'http://dhscycle.com',
 ];
 
 app.use(cors({

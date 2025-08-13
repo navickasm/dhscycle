@@ -7,8 +7,9 @@ interface TimerProps {
 
 const Timer: React.FC<TimerProps> = ({ start, end }) => {
     const [background, setBackground] = useState<string>('rgb(255, 255, 255)');
+    const [remainingTime, setRemainingTime] = useState<string>("");
 
-    // TODO make this work for CT
+    // TODO make this work for CT, make <title> state-aware for efficiency
     useEffect(() => {
         const updateProgress = () => {
             const now = new Date();
@@ -23,11 +24,20 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
 
             const progressPercentage = Math.min(100, Math.max(0, (elapsedDuration / totalDuration) * 100));
 
-            setBackground(
-                progressPercentage >= 100 || progressPercentage <= 0
-                    ? ""
-                    : `linear-gradient(to bottom, var(--main) ${progressPercentage}%, var(--light) ${progressPercentage}%)`
-            );
+            const periodTime = Math.ceil(totalDuration / (1000 * 60))
+
+            if (progressPercentage >= 100 || progressPercentage <= 0) {
+                const minutesUntilStart = Math.ceil((startTime.getTime() - now.getTime()) / (1000 * 60));
+                if (now < startTime && minutesUntilStart <= 30) {
+                    setRemainingTime(`${periodTime} mins (${minutesUntilStart} mins until start)`);
+                } else {
+                    setRemainingTime(`${periodTime} mins`);
+                }
+                setBackground("--var(bg)");
+            } else {
+                setBackground(`linear-gradient(to bottom, var(--main) ${progressPercentage}%, var(--light) ${progressPercentage}%)`);
+                setRemainingTime(`${periodTime} mins (${Math.ceil((endTime.getTime() - now.getTime()) / (1000 * 60))} mins left)`);
+            }
         };
 
         updateProgress();
@@ -47,7 +57,7 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
                 background: background,
                 zIndex: 0,
                 transition: 'background 0.5s ease-out',
-            }}
+            }} title={ remainingTime }
         />
     );
 };
