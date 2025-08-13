@@ -8,7 +8,7 @@
   --light: #f9e1e1;
   --link-clicked: #eea5a5;
 
-  --border: #e8e8e8;
+  --dhsCycleBorder: #e8e8e8;
 }
 
 /*@media (prefers-color-scheme: dark) {*/
@@ -53,20 +53,20 @@ table {
   background-color: var(--bg);
   border-collapse: collapse;
   border-width: 2px;
-  border-color: var(--border);
+  border-color: var(--dhsCycleBorder);
   border-style: solid;
   text-align: center;
 }
 
 table thead {
-  background-color: var(--border);
+  background-color: var(--dhsCycleBorder);
   font-weight: bold;
 }
 
 table td,
 table th {
   border-width: 2px;
-  border-color: var(--border);
+  border-color: var(--dhsCycleBorder);
   border-style: solid;
   padding: 10px;
   position: relative;

@@ -5,7 +5,7 @@ table.schedule {
 table.schedule td,
 table.schedule th {
   border-width: 2px;
-  border-color: var(--border);
+  border-color: var(--dhsCycleBorder);
   border-style: solid;
   padding: 10px;
   position: relative;
@@ -19,7 +19,7 @@ table.schedule td.lunch {
 }
 
 table.schedule td.fakeLunch {
-  background-color: var(--border);
+  background-color: var(--dhsCycleBorder);
 }
 
 table.schedule td.dash {
@@ -27,7 +27,7 @@ table.schedule td.dash {
 }
 
 td.se-filler {
-  background-color: var(--border);
+  background-color: var(--dhsCycleBorder);
 }
 
 .pn {
