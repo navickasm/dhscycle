@@ -11,7 +11,7 @@ export interface PeriodBlockProps {
     type?: "normal" | "vertical" | "big" | "horiz";
 }
 
-function to12Hr(time24: string): string {
+export function to12Hr(time24: string): string {
     const [hours, minutes] = time24.split(":").map(Number);
     return `${hours % 12 || 12}:${minutes.toString().padStart(2, "0")}`;
 }

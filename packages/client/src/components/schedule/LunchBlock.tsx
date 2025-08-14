@@ -1,6 +1,6 @@
 // src/components/schedule/LunchBlock.tsx
 import styles from "../schedule.module.css";
-import {PeriodBlockContent, preferredPeriodName} from "./PeriodBlock.tsx";
+import {PeriodBlockContent, preferredPeriodName, to12Hr} from "./PeriodBlock.tsx";
 import type { LunchBlock } from "../../schedule.ts";
 import {JSX} from "react";
 import Timer from "./Timer.tsx";
@@ -22,9 +22,9 @@ function Lunch({ period }: { period: any }) {
             }}>
                 {preferredPeriodName(period.period)}
                 <span className={styles.pt} style={{ textAlign: "center", lineHeight: "0.9" }}>
-                    {period.start}
+                    {to12Hr(period.start)}
                     <br />–<br/>
-                    {period.end}
+                    {to12Hr(period.end)}
                 </span>
             </div>
             <Timer start={period.start} end={period.end} />
