@@ -21,8 +21,7 @@
   },
   "workspaces": [
     "packages/server",
-    "packages/client",
-    "packages/common"
+    "packages/client"
   ],
   "dependencies": {
     "cors": "^2.8.5",
