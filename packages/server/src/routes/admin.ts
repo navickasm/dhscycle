@@ -1,16 +1,17 @@
 import { Router } from 'express';
-import { getCentralTimeDateString } from '../utils.js';
-import { scheduleCache, isCacheValid } from '../cache.js';
-import {fetchScheduleFromDb, populateDb} from '../service.js';
+import dotenv from 'dotenv';
+import {populateDb} from '../service.js';
 
 const router = Router();
 
-/**
- * Query parameters:
- * startDate: string (YYYY-MM-DD) - the starting date to populate
- * endDate: string (YYYY-MM-DD) - the ending date to populate
- */
+dotenv.config();
+
 router.post('/admin/populate', async (req, res) => {
+    const apiKey = req.headers['x-api-key'];
+    if (apiKey !== process.env.ADMIN_API_KEY) {
+        return res.status(403).json({ message: 'Forbidden: Invalid API Key' });
+    }
+
     await populateDb(req.query.startDate as string, req.query.endDate as string).then(() => {
         res.status(200).json({ message: 'Database populated successfully.' });
     }).catch(error => {

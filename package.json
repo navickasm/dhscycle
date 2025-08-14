@@ -25,6 +25,7 @@
     "packages/common"
   ],
   "dependencies": {
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1"
   }
 }
