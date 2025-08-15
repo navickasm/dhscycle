@@ -7,6 +7,7 @@ import cors from 'cors';
 
 import scheduleRouter from './routes/schedule.js';
 import adminRouter from './routes/admin.js';
+import publicRouter from './routes/public.js';
 import {closeDatabase, initializeDatabase} from "./database.js";
 
 dotenv.config();
@@ -46,6 +47,7 @@ app.use(limiter);
 
 app.use(scheduleRouter);
 app.use(adminRouter);
+app.use(publicRouter);
 
 // app.use((req, res) => {
 //     res.status(501).send();
