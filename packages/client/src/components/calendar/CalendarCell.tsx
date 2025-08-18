@@ -25,21 +25,22 @@ export type CalendarCellProps =
     noSchoolReason?: string;
 };
 
-const getScheduleTypeColor = (type: ScheduleType | undefined): string => {
-    switch (type) {
-        case 'A':
-            return '#1155cc';
-        case '16':
-            return '#e69138';
-        case '27':
-            return '#38761d';
-        case '38':
-            return '#351c75';
-        case '45':
-            return '#cc0000';
-        default:
-            return '#666666';
-    }
+const scheduleTypeColors: { [key in ScheduleType | 'default']?: string } = {
+    'A':  '#1155cc',
+    '16': '#e69138',
+    '27': '#38761d',
+    '38': '#351c75',
+    '45': '#cc0000',
+    'default': '#666666',
+};
+
+const scheduleTypeColorsPastel: { [key in ScheduleType | 'default']?: string } = {
+    'A':  '#1155cc22',
+    '16': '#e6913822',
+    '27': '#38761d22',
+    '38': '#351c7522',
+    '45': '#cc000022',
+    'default': '#ffffff',
 };
 
 function YesSchoolBottom(p: CalendarCellProps): JSX.Element {
@@ -69,7 +70,7 @@ function YesSchoolBottom(p: CalendarCellProps): JSX.Element {
             </div>
 
             <span style={{
-                color: getScheduleTypeColor(p.scheduleType),
+                color: scheduleTypeColors[p.scheduleType ?? 'default'],
                 fontWeight: "bold",
                 fontSize: "2rem",
                 marginBottom: "-0.17em"
@@ -102,12 +103,13 @@ export function CalendarCell(p: CalendarCellProps): JSX.Element {
                 padding: '0.5rem',
                 width: '140px',
                 minWidth: '140px',
+                backgroundColor: scheduleTypeColorsPastel[p.scheduleType ?? 'default'],
             }}>
                 <div style={{
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    height: '100%'
+                    height: '100%',
                 }}>
                     <div style={{
                         display: 'flex',
