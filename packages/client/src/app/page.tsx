@@ -53,7 +53,7 @@ export default function Home() {
     useEffect(() => {
         const fetchSchedule = async () => {
             try {
-                const scheduleResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com'}/schedule/${date.toISOString().split('T')[0]}`); // Format date for URL
+                const scheduleResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com'}/schedule/${date.toISOString().split('T')[0]}`);
                 if (!scheduleResponse.ok) {
                     throw new Error(`HTTP error! status: ${scheduleResponse.status}`);
                 }
@@ -70,16 +70,27 @@ export default function Home() {
 
                     setSchedule(scheduleData);
                 }
+            } catch (error) {
+                console.error("Error fetching schedule:", error);
+            }
+        };
 
+        const fetchThisWeek = async () => {
+            try {
                 const thisWeekResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com'}/thisWeek`);
                 if (!thisWeekResponse.ok) {
                     throw new Error(`HTTP error! status: ${thisWeekResponse.status}`);
                 }
 
                 const thisWeekData: ThisWeekSchedule[] = await thisWeekResponse.json();
-
                 setThisWeek(thisWeekData);
+            } catch (error) {
+                console.error("Error fetching this week schedule:", error);
+            }
+        };
 
+        const fetchCalendar = async () => {
+            try {
                 const calendarResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com'}/calendar/${date.getMonth() + 1}`);
                 if (!calendarResponse.ok) {
                     throw new Error(`HTTP error! status: ${calendarResponse.status}`);
@@ -96,11 +107,13 @@ export default function Home() {
 
                 setCalendar(calendarData);
             } catch (error) {
-                console.error("Error fetching schedule:", error);
+                console.error("Error fetching calendar:", error);
             }
         };
 
         fetchSchedule();
+        fetchThisWeek();
+        fetchCalendar();
     }, [date]);
 
     return (
