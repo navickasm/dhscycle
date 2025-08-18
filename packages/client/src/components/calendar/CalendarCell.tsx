@@ -92,7 +92,7 @@ function NoSchoolBottom(p: CalendarCellProps): JSX.Element {
 }
 
 export function CalendarCell(p: CalendarCellProps): JSX.Element {
-    const dayNumber = p.date.getDate();
+    const dayNumber = p.date.getUTCDate();
 
     // TODO make the specialNote more efficient
     return (
