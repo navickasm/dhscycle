@@ -96,14 +96,18 @@ export default function Home() {
                     throw new Error(`HTTP error! status: ${calendarResponse.status}`);
                 }
 
-                const calendarData: CalendarCellProps[] = (await calendarResponse.json()).map((item: any) => ({
-                    ...item,
-                    date: new Date(Date.UTC(
-                        parseInt(item.date.split("-")[0], 10), //Y
-                        parseInt(item.date.split("-")[1], 10) - 1, //M
-                        parseInt(item.date.split("-")[2], 10) //D
-                    )),
-                }));
+                const calendarData: CalendarCellProps[] = (await calendarResponse.json()).map((item: any) => {
+                    const isHighlighted = item.date === date.toISOString().split('T')[0];
+                    return {
+                        ...item,
+                        date: new Date(Date.UTC(
+                            parseInt(item.date.split("-")[0], 10), //Y
+                            parseInt(item.date.split("-")[1], 10) - 1, //M
+                            parseInt(item.date.split("-")[2], 10) //D
+                        )),
+                        highlighted: isHighlighted,
+                    };
+                });
 
                 setCalendar(calendarData);
             } catch (error) {

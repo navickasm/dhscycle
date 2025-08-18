@@ -38,7 +38,7 @@ export default function Calendar(p: CalendarProps) {
                             return <td key={`padding-${cellIndex}`}/>;
                         }
                         const cell = p.cells[cellIndex - paddingNeeded];
-                        return cell ? <CalendarCell key={cellIndex} {...cell} /> : <td key={`empty-${cellIndex}`}/>;
+                        return cell ? <CalendarCell key={cellIndex} {...cell}/> : <td key={`empty-${cellIndex}`}/>;
                     })}
                 </tr>
             ))}

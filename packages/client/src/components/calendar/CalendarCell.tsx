@@ -13,6 +13,7 @@ export type CalendarCellProps =
     isSpecial?: boolean;
     isNoSchool?: false;
     noSchoolReason?: never;
+    highlighted: boolean;
 }
     | { // No school
     date: Date;
@@ -23,6 +24,7 @@ export type CalendarCellProps =
     scheduleType?: never;
     isNoSchool: true;
     noSchoolReason?: string;
+    highlighted: boolean;
 };
 
 const scheduleTypeColors: { [key in ScheduleType | 'default']?: string } = {
@@ -95,6 +97,8 @@ function NoSchoolBottom(p: CalendarCellProps): JSX.Element {
 export function CalendarCell(p: CalendarCellProps): JSX.Element {
     const dayNumber = p.date.getUTCDate();
 
+    console.log(`Rendering CalendarCell for date: ${p.date.toISOString()}, highlighted: ${p.highlighted}`);
+
     // TODO make the specialNote more efficient
     return (
         <>
@@ -104,6 +108,7 @@ export function CalendarCell(p: CalendarCellProps): JSX.Element {
                 width: '140px',
                 minWidth: '140px',
                 backgroundColor: scheduleTypeColorsPastel[p.scheduleType ?? 'default'],
+                border: p.highlighted ? '3px solid var(--main)' : undefined,
             }}>
                 <div style={{
                     display: 'flex',
