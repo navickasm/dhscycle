@@ -41,7 +41,7 @@ td.se-filler {
   vertical-align: middle;
   text-align: left;
   z-index: 1;
-  color: var(--pn);
+  /*color: var(--pn);*/
 }
 
 .pt {
