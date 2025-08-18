@@ -25,6 +25,7 @@ export default function NotifBox(p: NotifBoxProps) {
                     color: "var(--fg)",
                     cursor: "pointer"
                 }}
+                aria-label={"Close"}
             >
                 ✖
             </button>
