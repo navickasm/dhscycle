@@ -120,6 +120,9 @@ export default function Home() {
                 </div>
                 <Calendar cells={calendar}/>
             </main>
+            <footer style={{ textAlign: "center", padding: "10px", marginTop: "20px", backgroundColor: "#f0f0f0" }}>
+                <p>&copy; {new Date().getFullYear()} Mack Navickas/<a href={"https://greatlakes.software"} style={{color: "#29abe2"}}>GLS</a>. Work in Progress &mdash; <a href={"https://github.com/navickasm/dhscycle/issues"}>Issue Tracker</a></p>
+            </footer>
         </div>
     );
 }
