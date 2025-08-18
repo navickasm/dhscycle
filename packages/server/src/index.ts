@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 
 import scheduleRouter from './routes/schedule.js';
+import calendarRouter from './routes/calendar.js';
 import adminRouter from './routes/admin.js';
 import publicRouter from './routes/public.js';
 import {closeDatabase, initializeDatabase} from "./database.js";
@@ -38,6 +39,7 @@ initializeDatabase().then(r => {
 })
 
 app.use(scheduleRouter);
+app.use(calendarRouter);
 app.use(adminRouter);
 app.use(publicRouter);
 

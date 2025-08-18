@@ -1,5 +1,7 @@
-table.schedule {
+table.schedule,
+table.thisWeek {
   width: 200px;
+  text-align: center;
 }
 
 table.schedule td,

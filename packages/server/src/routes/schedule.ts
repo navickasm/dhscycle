@@ -2,14 +2,11 @@ import {Router} from 'express';
 import {getCentralTimeDateString} from '../utils.js';
 import {isCacheValid, scheduleCache} from '../cache.js';
 import {fetchScheduleFromDb, fetchWeekNamesFromDb, incrementCounter} from '../service.js';
-import fs from "fs";
-import path from "path";
 
-// TODO review this logic
 async function getBellScheduleForDate(dateStr: string): Promise<any> {
     const todayDateStr = getCentralTimeDateString(new Date());
 
-    if (dateStr === todayDateStr && isCacheValid()) {
+    if (dateStr === todayDateStr && isCacheValid("schedule")) {
         console.log(`Serving schedule for ${dateStr} from cache.`);
         return scheduleCache.schedule!;
     }

@@ -4,3 +4,11 @@
   gap: 30px;
   padding: 30px;
 }
+
+@media (max-width: 768px) {
+  .page > .main > div.lineup {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

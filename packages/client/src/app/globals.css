@@ -55,7 +55,6 @@ table {
   border-width: 2px;
   border-color: var(--dhsCycleBorder);
   border-style: solid;
-  text-align: center;
 }
 
 table thead {

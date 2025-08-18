@@ -9,7 +9,7 @@ interface ThisWeekProps {
 export default function ThisWeek(p: ThisWeekProps) {
     return (
         <>
-            <table>
+            <table className={styles.thisWeek}>
                 <thead>
                 <tr>
                     <td colSpan={2}>This Week's Schedule</td>

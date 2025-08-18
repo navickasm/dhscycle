@@ -1,11 +1,18 @@
 import { getCentralTimeDateString } from './utils.js';
+import {CalendarCells} from "./routes/calendar.js";
 
+// TODO make more efficient, separate caches. Not a huge problem right now since it's a 3-second calc max for the first to visit the site of the day.
 interface ScheduleCache {
     schedule: string | null;
     timestamp: Date | null;
 }
 
-const scheduleCache: ScheduleCache = (() => {
+interface CalendarCache {
+    calendar: CalendarCells[] | null;
+    key: number | null;
+}
+
+export const scheduleCache: ScheduleCache = (() => {
     let _schedule: string | null = null;
 
     return {
@@ -20,17 +27,39 @@ const scheduleCache: ScheduleCache = (() => {
     };
 })();
 
-function isCacheValid(): boolean {
-    if (scheduleCache.schedule === null || scheduleCache.timestamp === null) return false;
-    const currentCentralDayStr = getCentralTimeDateString(new Date());
-    const cachedDateCentralDayStr = getCentralTimeDateString(scheduleCache.timestamp);
-    return cachedDateCentralDayStr === currentCentralDayStr;
+export const calendarCache: CalendarCache = (() => {
+    let _calendar: CalendarCells[] | null = null;
+
+    return {
+        get calendar() {
+            return _calendar;
+        },
+        set calendar(value: CalendarCells[] | null) {
+            _calendar = value;
+            this.key = value ? new Date(Date.now()).getUTCMonth() : null;
+        },
+        key: null,
+        timestamp: null
+    };
+})();
+
+export function isCacheValid(cacheType: "schedule" | "calendar"): boolean {
+    if (cacheType === "schedule") {
+        if (scheduleCache.schedule === null || scheduleCache.timestamp === null) return false;
+        const currentCentralDayStr = getCentralTimeDateString(new Date());
+        const cachedDateCentralDayStr = getCentralTimeDateString(scheduleCache.timestamp);
+        return cachedDateCentralDayStr === currentCentralDayStr;
+    } else if (cacheType === "calendar") {
+        if (calendarCache.calendar === null || calendarCache.key === null) return false;
+        const currentMonth = new Date().getUTCMonth();
+        return calendarCache.key === currentMonth;
+    }
+    return false;
 }
 
-function invalidateCache(): void {
+export function invalidateCaches(): void {
     scheduleCache.schedule = null;
     scheduleCache.timestamp = null;
     console.log("Cache invalidated by admin request.");
 }
 
-export { scheduleCache, isCacheValid, invalidateCache };

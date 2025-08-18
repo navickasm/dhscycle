@@ -7,6 +7,8 @@ import {Schedule} from "../schedule.ts";
 import Table from "../components/schedule/Table.tsx";
 import ThisWeek, {ThisWeekSchedule} from "../components/thisweek/ThisWeek.tsx";
 import NotifBox from "../components/NotifBox.tsx";
+import Calendar from "../components/calendar/Calendar.tsx";
+import {CalendarCellProps} from "../components/calendar/CalendarCell.tsx";
 
 export default function Home() {
     const [date, setDate] = useState<Date>(new Date());
@@ -14,6 +16,7 @@ export default function Home() {
 
     const [schedule, setSchedule] = useState<Schedule | null>(null);
     const [thisWeek, setThisWeek] = useState<ThisWeekSchedule[] | null>(null);
+    const [calendar, setCalendar] = useState<CalendarCellProps[]>([]);
 
     const [isVisible, setIsVisible] = useState(true);
 
@@ -60,14 +63,13 @@ export default function Home() {
                 if (scheduleData.noSchool) {
                     setH2(scheduleData.reason && scheduleData.reason !== 'NO_SCHEDULE_DATA' ? `No School: ${scheduleData.reason}` : "No School");
                     setSchedule(scheduleData);
-                    return;
-                }
+                } else {
+                    if (scheduleData.h2) {
+                        setH2(scheduleData.h2);
+                    }
 
-                if (scheduleData.h2) {
-                    setH2(scheduleData.h2);
+                    setSchedule(scheduleData);
                 }
-
-                setSchedule(scheduleData);
 
                 const thisWeekResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com'}/thisWeek`);
                 if (!thisWeekResponse.ok) {
@@ -78,6 +80,21 @@ export default function Home() {
 
                 setThisWeek(thisWeekData);
 
+                const calendarResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com'}/calendar/${date.getMonth() + 1}`);
+                if (!calendarResponse.ok) {
+                    throw new Error(`HTTP error! status: ${calendarResponse.status}`);
+                }
+
+                const calendarData: CalendarCellProps[] = (await calendarResponse.json()).map((item: any) => ({
+                    ...item,
+                    date: new Date(Date.UTC(
+                        parseInt(item.date.split("-")[0], 10), //Y
+                        parseInt(item.date.split("-")[1], 10) - 1, //M
+                        parseInt(item.date.split("-")[2], 10) //D
+                    )),
+                }));
+
+                setCalendar(calendarData);
             } catch (error) {
                 console.error("Error fetching schedule:", error);
             }
@@ -91,15 +108,17 @@ export default function Home() {
             <main className={styles.main}>
                 {/*{isVisible && <NotifBox title={"Welcome back!"} message={"This site, DHS Cycle, was rewritten over the summer to better support students with the new bell schedule. As such, some features (like the color editor) may be temporarily disabled. They will return soon alongside more advanced features!"} onClose={handleCloseNotif}/>}*/}
                 <Heading date={date} h2={h2}></Heading>
-                <div style={{display: "flex",
+                <div style={{
+                    display: "flex",
                     gap: "20px",
                     alignItems: "flex-start",
                     justifyContent: "center",
                     flexWrap: "wrap"
                 }}>
-                    {schedule && <Table schedule={schedule} />}
+                    {schedule && !schedule.noSchool && <Table schedule={schedule} />}
                     <ThisWeek schedule={thisWeek || []}/>
                 </div>
+                <Calendar cells={calendar}/>
             </main>
         </div>
     );

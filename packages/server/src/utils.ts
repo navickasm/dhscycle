@@ -17,3 +17,11 @@ export function getCentralTimeDateString(date: Date): string {
     }
     return `${year}-${month}-${day}`;
 }
+
+export function parseScheduleData(scheduleData: string): any {
+    try {
+        return JSON.parse(scheduleData.replace(/\\"/g, '"'));
+    } catch (err: unknown) {
+        throw new Error(`Invalid JSON string: ${err}`);
+    }
+}
