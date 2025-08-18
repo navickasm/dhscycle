@@ -10,8 +10,8 @@ export async function fetchWeekNamesFromDb(dateStr: string): Promise<{
     if (!dateStr) return Promise.reject(new Error("Date string is required."));
 
     try {
-        const weekStart = DateTime.fromISO(dateStr).startOf('week').toISODate();
-        const weekEnd = DateTime.fromISO(dateStr).endOf('week').toISODate();
+        const weekStart = DateTime.fromISO(dateStr).plus({days: 2}).set({weekday: 1}).toISODate();
+        const weekEnd = DateTime.fromISO(dateStr).plus({days: 6}).set({weekday: 5}).toISODate();
 
         console.log(weekStart + " " + weekEnd);
         const sql = `SELECT DISTINCT

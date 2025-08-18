@@ -61,13 +61,15 @@ export default function Home() {
                     setH2(scheduleData.reason && scheduleData.reason !== 'NO_SCHEDULE_DATA' ? `No School: ${scheduleData.reason}` : "No School");
                     setSchedule(scheduleData);
                     return;
+                } else {
+                    if (scheduleData.h2) {
+                        setH2(scheduleData.h2);
+                    }
+
+                    setSchedule(scheduleData);
                 }
 
-                if (scheduleData.h2) {
-                    setH2(scheduleData.h2);
-                }
 
-                setSchedule(scheduleData);
 
                 const thisWeekResponse = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com'}/thisWeek`);
                 if (!thisWeekResponse.ok) {
