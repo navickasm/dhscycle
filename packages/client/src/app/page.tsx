@@ -89,7 +89,7 @@ export default function Home() {
     return (
         <div className={styles.page}>
             <main className={styles.main}>
-                {isVisible && <NotifBox title={"Welcome back!"} message={"This site, DHS Cycle, was rewritten over the summer to better support students with the new bell schedule. As such, some features (like the color editor) may be temporarily disabled. They will return soon alongside more advanced features!"} onClose={handleCloseNotif}/>}
+                {/*{isVisible && <NotifBox title={"Welcome back!"} message={"This site, DHS Cycle, was rewritten over the summer to better support students with the new bell schedule. As such, some features (like the color editor) may be temporarily disabled. They will return soon alongside more advanced features!"} onClose={handleCloseNotif}/>}*/}
                 <Heading date={date} h2={h2}></Heading>
                 <div style={{display: "flex",
                     gap: "20px",
