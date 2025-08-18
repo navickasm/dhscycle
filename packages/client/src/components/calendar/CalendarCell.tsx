@@ -43,7 +43,6 @@ const getScheduleTypeColor = (type: ScheduleType | undefined): string => {
 };
 
 function YesSchoolBottom(p: CalendarCellProps): JSX.Element {
-    console.log(p.specialModifications);
     return (
         <div style={{
             display: 'flex',
