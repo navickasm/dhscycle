@@ -2,7 +2,6 @@
 
 import Express from 'express';
 import dotenv from 'dotenv';
-import rateLimit from "express-rate-limit";
 import cors from 'cors';
 
 import scheduleRouter from './routes/schedule.js';
@@ -37,13 +36,6 @@ app.use(cors({
 initializeDatabase().then(r => {
     console.log("Database initialized successfully");
 })
-
-const limiter = rateLimit({
-    windowMs: 1000 * 3,
-    max: 5,
-});
-
-app.use(limiter);
 
 app.use(scheduleRouter);
 app.use(adminRouter);
