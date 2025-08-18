@@ -131,9 +131,11 @@ export default function Home() {
                     {schedule && !schedule.noSchool && <Table schedule={schedule} />}
                     <ThisWeek schedule={thisWeek || []}/>
                 </div>
-                <Calendar cells={calendar}/>
+                <div style={{overflowX: "auto", width: "100%"}}>
+                    <Calendar cells={calendar}/>
+                </div>
             </main>
-            <footer style={{ textAlign: "center", padding: "10px", marginTop: "20px", backgroundColor: "#f0f0f0" }}>
+            <footer style={{textAlign: "center", padding: "10px", marginTop: "20px", backgroundColor: "#f0f0f0" }}>
                 <p>&copy; {new Date().getFullYear()} Mack Navickas/<a href={"https://greatlakes.software"} style={{color: "#29abe2"}}>GLS</a>. Work in Progress &mdash; <a href={"https://github.com/navickasm/dhscycle/issues"}>Issue Tracker</a></p>
             </footer>
         </div>

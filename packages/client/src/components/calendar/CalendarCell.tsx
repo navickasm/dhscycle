@@ -101,6 +101,7 @@ export function CalendarCell(p: CalendarCellProps): JSX.Element {
                 height: '7rem',
                 padding: '0.5rem',
                 width: '140px',
+                minWidth: '140px',
             }}>
                 <div style={{
                     display: 'flex',
@@ -131,7 +132,7 @@ export function CalendarCell(p: CalendarCellProps): JSX.Element {
                         }}>{dayNumber}</p>
                     </div>
 
-                    { p.isNoSchool ? <NoSchoolBottom {...p} /> : <YesSchoolBottom {...p} /> }
+                    {p.isNoSchool ? <NoSchoolBottom {...p} /> : <YesSchoolBottom {...p} />}
                 </div>
             </td>
         </>
