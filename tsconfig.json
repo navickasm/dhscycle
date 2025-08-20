@@ -23,7 +23,6 @@
         "incremental": true,
         "allowUnreachableCode": false,
         "references": [
-            { "path": "./packages/common" },
             { "path": "./packages/server" },
             { "path": "./packages/client" }
         ]
