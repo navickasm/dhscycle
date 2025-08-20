@@ -25,6 +25,15 @@ v1/
 packages/client/.next/
 /out/
 
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Metro
+.metro-health-check*
+
 # production
 /build
 /packages/*/dist
@@ -43,6 +52,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+.env*.local
 
 # vercel
 .vercel
