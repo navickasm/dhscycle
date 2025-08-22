@@ -57,6 +57,7 @@ export function isCacheValid(cacheType: "schedule" | "calendar"): boolean {
     return false;
 }
 
+// TODO add specific cache invalidation strategies
 export function invalidateCaches(): void {
     scheduleCache.schedule = null;
     scheduleCache.timestamp = null;
