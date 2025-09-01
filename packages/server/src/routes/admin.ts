@@ -21,7 +21,7 @@ router.post('/admin/populate', async (req, res) => {
     });
 });
 
-router.post('admin/invalidateCache', (req, res) => {
+router.post('/admin/invalidateCache', (req, res) => {
     const apiKey = req.headers['x-api-key'];
     if (apiKey !== process.env.ADMIN_API_KEY) {
         return res.status(403).json({ message: 'Forbidden: Invalid API Key' });
