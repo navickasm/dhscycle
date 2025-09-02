@@ -36,7 +36,7 @@ const scheduleTypeColors: { [key in ScheduleType | 'default']?: string } = {
     'default': '#666666',
 };
 
-const scheduleTypeColorsPastel: { [key in ScheduleType | 'default']?: string } = {
+export const scheduleTypeColorsPastel: { [key in ScheduleType | 'default']?: string } = {
     'A':  '#1155cc22',
     '16': '#e6913822',
     '27': '#38761d22',
