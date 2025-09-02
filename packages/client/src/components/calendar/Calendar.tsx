@@ -17,7 +17,7 @@ export default function Calendar(p: CalendarProps) {
         <table style={{padding: "1rem", margin: "0 auto"}}>
             <thead>
             <tr>
-                <th colSpan={5}>{new Intl.DateTimeFormat('en-US', {month: 'long'}).format(p.cells[0].date)}</th>
+                <th colSpan={5}>{p.cells[0].date.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' })}</th>
             </tr>
             </thead>
             <tbody>

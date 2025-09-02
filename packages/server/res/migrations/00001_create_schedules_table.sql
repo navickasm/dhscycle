@@ -6,7 +6,7 @@ CREATE TABLE schedules (
     special_schedule_base TEXT,
     schedule_json TEXT,
     CHECK (
-            (regularity = 'special' AND special_schedule_name IS NOT NULL AND special_schedule_h2 IS NOT NULL AND schedule_json IS NOT NULL AND special_schedule_base IN ('A', '16', '27', '38', '45', 'none'))
+            (regularity = 'special' AND special_schedule_name IS NOT NULL AND schedule_json IS NOT NULL AND special_schedule_base IN ('A', '16', '27', '38', '45', 'none'))
             OR
             (regularity = 'no' AND special_schedule_name IS NOT NULL AND special_schedule_h2 IS NULL AND schedule_json IS NULL AND special_schedule_base IS NULL)
             OR

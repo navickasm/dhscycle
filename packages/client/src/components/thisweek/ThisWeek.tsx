@@ -1,3 +1,4 @@
+import React from "react";
 import styles from "../schedule.module.css";
 
 export interface ThisWeekSchedule { day: string; scheduleName: string }
@@ -19,7 +20,14 @@ export default function ThisWeek(p: ThisWeekProps) {
                 {p.schedule.map((entry, index) => (
                     <tr key={index}>
                         <td>{entry.day}</td>
-                        <td>{entry.scheduleName}</td>
+                        <td style={{minWidth: "144px"}}>
+                            {entry.scheduleName.split('%%').map((part, i) => (
+                                <React.Fragment key={i}>
+                                    {i > 0 && <br/>}
+                                    {part}
+                                </React.Fragment>
+                            ))}
+                        </td>
                     </tr>
                 ))}
                 </tbody>

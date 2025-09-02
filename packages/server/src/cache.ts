@@ -61,6 +61,8 @@ export function isCacheValid(cacheType: "schedule" | "calendar"): boolean {
 export function invalidateCaches(): void {
     scheduleCache.schedule = null;
     scheduleCache.timestamp = null;
+    calendarCache.key = null;
+    calendarCache.calendar = null;
     console.log("Cache invalidated by admin request.");
 }
 

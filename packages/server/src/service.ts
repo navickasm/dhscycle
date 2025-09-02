@@ -9,7 +9,11 @@ export async function getCalendarForMonth(month: number): Promise<CalendarCells[
     try {
         const year = month >= 8 ? 2025 : 2026;
         const startDate = DateTime.fromObject({ year, month }).startOf('month').toISODate();
-        const endDate = DateTime.fromObject({ year, month }).endOf('month').toISODate();
+        const endDate = DateTime.fromObject({ year, month })
+            .endOf('month')
+            .set({ weekday: 5 }) // Set to Friday
+            .plus({ days: DateTime.fromObject({ year, month }).endOf('month').weekday > 5 ? 7 : 0 }) // Adjust to next Friday if needed
+            .toISODate();
 
         console.log(`Fetching calendar data for month: ${month} (${startDate} to ${endDate})`);
 
@@ -20,6 +24,7 @@ export async function getCalendarForMonth(month: number): Promise<CalendarCells[
                 s.special_schedule_name,
                 s.special_schedule_h2,
                 s.special_schedule_base,
+                s.calendar_events,
                 s.schedule_json
             FROM schedules s
             WHERE s.date BETWEEN ? AND ?;
@@ -28,7 +33,7 @@ export async function getCalendarForMonth(month: number): Promise<CalendarCells[
 
         // Map the database rows to CalendarCellProps
         return Promise.all(rows.map(async (row: any) => {
-            const isNoSchool = !row.schedule_json && row.regularity == 'special';
+            const isNoSchool = row.regularity === "no" || (row.regularity === 'special' && !row.schedule_json);
             return isNoSchool
                 ? {
                     date: new Date(row.date).toISOString().split('T')[0],
@@ -41,7 +46,7 @@ export async function getCalendarForMonth(month: number): Promise<CalendarCells[
                     scheduleType: row.regularity === "special"
                         ? (row.special_schedule_base && row.special_schedule_base !== "none" ? row.special_schedule_base : "other")
                         : (row.regularity || "other"),
-                    specialNote: undefined, // TODO fix (see issue #12)
+                    specialNote: row.calendar_events, // TODO fix (see issue #12)
                     specialModifications: row.special_schedule_name ? row.special_schedule_name.split("%%").slice(1) : undefined,
                     isSpecial: row.regularity === "special",
                 };
@@ -77,8 +82,9 @@ export async function fetchWeekNamesFromDb(dateStr: string): Promise<{
 
         const sql = `SELECT DISTINCT
             s.date,
+            s.regularity,
             CASE
-                WHEN s.regularity != 'special'
+                WHEN s.regularity NOT IN ('special', 'no')
                     THEN (
                         SELECT rs.name
                         FROM regular_schedules rs
@@ -95,8 +101,9 @@ export async function fetchWeekNamesFromDb(dateStr: string): Promise<{
             const currentDate = DateTime.fromISO(weekStart!).plus({days: i});
             const dayOfWeek = currentDate.toFormat('cccc');
             const entry = rows.find(row => row.date === currentDate.toISODate());
+            console.log(entry)
             return entry
-                ? {day: dayOfWeek, scheduleName: entry.schedule_name}
+                ? {day: dayOfWeek, scheduleName: entry.regularity === "no" ? `No School%%${entry.schedule_name}` : entry.schedule_name}
                 : {day: dayOfWeek, scheduleName: "No School"};
         });
     } catch (err) {
