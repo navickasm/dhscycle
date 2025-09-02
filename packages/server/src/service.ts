@@ -46,7 +46,7 @@ export async function getCalendarForMonth(month: number): Promise<CalendarCells[
                     scheduleType: row.regularity === "special"
                         ? (row.special_schedule_base && row.special_schedule_base !== "none" ? row.special_schedule_base : "other")
                         : (row.regularity || "other"),
-                    specialNote: row.calendar_events, // TODO fix (see issue #12)
+                    specialNote: row.calendar_events,
                     specialModifications: row.special_schedule_name ? row.special_schedule_name.split("%%").slice(1) : undefined,
                     isSpecial: row.regularity === "special",
                 };
