@@ -35,9 +35,9 @@ router.get('/admin/test', (req, res) => {
     console.log(apiKey);
     console.log(process.env.ADMIN_API_KEY);
     if (!process.env.ADMIN_API_KEY || apiKey !== process.env.ADMIN_API_KEY) {
-        return res.status(204).set('status', 'invalid');
+        return res.status(204).set('status', 'invalid').send();
     }
-    res.status(204).set('status', 'valid');
+    res.status(204).set('status', 'valid').send();
 });
 
 
