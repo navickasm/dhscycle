@@ -38,7 +38,7 @@ export enum Period {
 }
 
 export type Schedule = {
-    name: string | null;
+    name: string;
     h2: string | null;
     times: Array< TimeBlock | LunchBlock>;
     noSchool?: true;

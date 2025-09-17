@@ -3,6 +3,7 @@ import {Schedule} from "../../schedule.ts";
 import styles from "../schedule.module.css"
 import PeriodBlock from "./PeriodBlock.tsx";
 import LunchBlock from "./LunchBlock.tsx";
+import React from "react";
 
 interface TableProps {
     schedule: Schedule;
@@ -14,7 +15,14 @@ export default function Table(p: TableProps) {
             <table className={styles.schedule} style={{tableLayout: 'fixed', width: '200px'}}>
                 <thead>
                 <tr>
-                    <td colSpan={3}>{p.schedule.name}</td>
+                    <td colSpan={3}>
+                        {p.schedule.name.split('%%').map((part, i) => (
+                            <React.Fragment key={i}>
+                                {i > 0 && <br/>}
+                                {part}
+                            </React.Fragment>
+                        ))}
+                    </td>
                 </tr>
                 </thead>
                 <tbody>
