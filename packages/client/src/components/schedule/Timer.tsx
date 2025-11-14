@@ -51,7 +51,7 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
             }
         };
 
-        const handleVisbilityChange = () = {
+        const handleVisbilityChange = () => {
             if (document.visibilityState === "visible") {
                 stopTimer();
                 startTimer();
