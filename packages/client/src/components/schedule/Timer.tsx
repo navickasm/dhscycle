@@ -39,10 +39,12 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
                 setRemainingTime(`${periodTime} mins (${Math.ceil((endTime.getTime() - now.getTime()) / (1000 * 60))} mins left)`);
             }
         };
-
+        
+        const intervalId;
+        
         const startTimer = () => {
             updateProgress();
-            const intervalId = setInterval(updateProgress, 1000); // Update every second
+            setInterval(updateProgress, 1000); // Update every second
         };
 
         const stopTimer = () => {
