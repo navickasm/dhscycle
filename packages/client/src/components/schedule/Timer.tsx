@@ -40,10 +40,34 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
             }
         };
 
-        updateProgress();
-        const intervalId = setInterval(updateProgress, 1000); // Update every second
+        const startTimer = () => {
+            updateProgress();
+            const intervalId = setInterval(updateProgress, 1000); // Update every second
+        };
 
-        return () => clearInterval(intervalId);
+        const stopTimer = () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+
+        const handleVisbilityChange = () = {
+            if (document.visibilityState === "visible") {
+                stopTimer();
+                startTimer();
+            } else {
+                stopTimer();
+            }
+        };
+
+        startTimer();
+
+        document.addEventListener("visibilitychange", handeVisibilityChange);
+       
+        return () => {
+            stopTimer();
+            document.removeEventListener("visiblitychange", handleVisibilityChange);
+        }
     }, [start, end]);
 
     return (
