@@ -40,7 +40,7 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
             }
         };
         
-        const intervalId = setInterval(updateProgress, 1000);;
+        let intervalId;
         
         const startTimer = () => {
             updateProgress();
