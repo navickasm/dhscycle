@@ -25,7 +25,6 @@ export default function Heading(p: HeadingProps) {
     return (
         <>
             <h1 style={{ textAlign: "center" }}>{date}</h1>
-            {p.h2 && <h2 style={{ textAlign: "center" }}>{p.h2}</h2>}
 
             {p.h2 && <h2> {p.h2.split('%%').map((part, i) => (
                 <React.Fragment key={i}>
