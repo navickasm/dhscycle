@@ -33,17 +33,43 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
                 } else {
                     setRemainingTime(`${periodTime} mins`);
                 }
-                setBackground("--var(bg)");
+                setBackground("var(--bg)");
             } else {
                 setBackground(`linear-gradient(to bottom, var(--main) ${progressPercentage}%, var(--light) ${progressPercentage}%)`);
                 setRemainingTime(`${periodTime} mins (${Math.ceil((endTime.getTime() - now.getTime()) / (1000 * 60))} mins left)`);
             }
         };
+        
+        let intervalId = setInterval(updateProgress, 1000);
+        
+        const startTimer = () => {
+            updateProgress();
+            intervalId = setInterval(updateProgress, 1000); // Update every second
+        };
 
-        updateProgress();
-        const intervalId = setInterval(updateProgress, 1000); // Update every second
+        const stopTimer = () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
 
-        return () => clearInterval(intervalId);
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                stopTimer();
+                startTimer();
+            } else {
+                stopTimer();
+            }
+        };
+
+        startTimer();
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+       
+        return () => {
+            stopTimer();
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+        }
     }, [start, end]);
 
     return (
