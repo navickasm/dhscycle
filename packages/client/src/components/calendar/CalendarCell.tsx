@@ -1,6 +1,6 @@
 import React, {JSX} from 'react';
 
-type ScheduleType = 'A' | '16' | '27' | '38' | '45' | 'other';
+type ScheduleType = 'A' | '16' | '27' | '38' | '45' | 'other' | 's1finals' | 's2finals';
 type StartTime = '8:20' | '8:40' | 'other';
 
 export type CalendarCellProps =
@@ -59,7 +59,14 @@ function YesSchoolBottom(p: CalendarCellProps): JSX.Element {
                 {p.specialModifications && p.specialModifications.map((mod, index) => (
                     <p key={index} style={{
                         fontSize: '.725rem'
-                    }}>{mod}</p>
+                    }}>
+                        {mod.split('%%').map((part, i) => (
+                            <React.Fragment key={i}>
+                                {i > 0 && <br/>}
+                                {part}
+                            </React.Fragment>
+                        ))}
+                    </p>
                 ))}
 
                 {p.startTime && p.startTime != "other" && (
@@ -77,7 +84,7 @@ function YesSchoolBottom(p: CalendarCellProps): JSX.Element {
                 fontSize: "2rem",
                 marginBottom: "-0.17em"
             }}>
-                {p.scheduleType === "other" ? "S" : p.scheduleType}{p.isSpecial && <>*</>}
+                {['s1finals', 's2finals'].includes(p.scheduleType ?? '') ? "Finals" : (p.scheduleType === "other" ? "S" : p.scheduleType)}{p.isSpecial && <>*</>}
             </span>
         </div>
     );
@@ -88,7 +95,12 @@ function NoSchoolBottom(p: CalendarCellProps): JSX.Element {
         <>
             <p style={{fontWeight: "bold"}}>NO SCHOOL</p>
             {p.noSchoolReason && (
-                <p>{p.noSchoolReason}</p>
+                <p>{p.noSchoolReason.split('%%').map((part, i) => (
+                    <React.Fragment key={i}>
+                        {i > 0 && <br/>}
+                        {part}
+                    </React.Fragment>
+                ))}</p>
             )}
         </>
     );

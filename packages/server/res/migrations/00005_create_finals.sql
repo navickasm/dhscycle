@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS finals (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  schedule_json TEXT NOT NULL,
+  semester SMALLINT NOT NULL CHECK (semester IN (1, 2))
+);
