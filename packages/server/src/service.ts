@@ -84,7 +84,7 @@ export async function fetchWeekNamesFromDb(dateStr: string): Promise<{
             s.date,
             s.regularity,
             CASE
-                WHEN s.regularity NOT IN ('special', 'no')
+                WHEN s.regularity NOT IN ('special', 'no', 's1finals', 's2finals')
                     THEN (
                         SELECT rs.name
                         FROM regular_schedules rs
