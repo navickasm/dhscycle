@@ -11,19 +11,19 @@ window.SpecialSchedule = SpecialSchedule;
 
 var finalSchedule = {
   examDates: [
-    "May 27 2025",
-    "May 28 2025",
-    "May 30 2025"
+    "December 16 2025",
+    "December 17 2025",
+    "December 18 2025"
   ],
   examTimes: [
-    "8:10",
-    "9:25",
-    "10:40",
-    "11:55",
+    "8:40",
+    "10:00",
+    "10:55",
+    "12:15",
     "13:10",
-    "14:25"
+    "14:30"
   ],
-  periodSchedule: [8,7,6,5,4,3,2,1,9] // 9 == Make up
+  periodSchedule: [1,2,3,4,5,6,7,8,9] // 9 == Make up
 }
 
 var scheduleData = [
