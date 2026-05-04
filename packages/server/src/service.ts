@@ -32,7 +32,7 @@ export async function getCalendarForMonth(month: number): Promise<CalendarCells[
         const rows = await dbAll(sql, [startDate, endDate]);
 
         // Map the database rows to CalendarCellProps
-        return Promise.all(rows.map(async (row: any) => {
+        return Promise.all(rows.filter((row: any) => row.date).map(async (row: any) => {
             const isNoSchool = row.regularity === "no" || (row.regularity === 'special' && !row.schedule_json);
             return isNoSchool
                 ? {
@@ -63,6 +63,11 @@ async function getStartTime(row: any): Promise<StartTime> {
         : row.regularity && row.regularity != "special"
             ? parseScheduleData(await fetchRegularSchedule(row.regularity) || "[]")
             : [];
+
+    if (!Array.isArray(schedule)) {
+        console.error("Invalid schedule data:", schedule);
+        return "other";
+    }
 
     const period1 = schedule.find((item: any) => item.period === "1") || schedule.find((item: any) => item.period === "2");
     return period1?.start === "08:20" ? "8:20" : period1?.start === "08:40" ? "8:40" : "other";
