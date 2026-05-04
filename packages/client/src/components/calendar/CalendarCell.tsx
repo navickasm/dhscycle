@@ -139,7 +139,12 @@ export function CalendarCell(p: CalendarCellProps): JSX.Element {
                             color: "#3468bd",
                             margin: 0,
                             padding: 0
-                        }}>{p.specialNote}</p>
+                        }}>{p.specialNote?.split('%%').map((part, i) => (
+                            <React.Fragment key={i}>
+                                {i > 0 && <br/>}
+                                {part}
+                            </React.Fragment>
+                        ))}</p>
                         <p style={{
                             fontSize: "1.125rem",
                             fontWeight: "bold",
