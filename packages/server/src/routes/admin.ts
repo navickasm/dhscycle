@@ -37,13 +37,4 @@ router.post('/admin/invalidateCache', adminAuth, (req, res) => {
     res.status(200).json({ message: 'Caches invalidated successfully.' });
 });
 
-router.get('/admin/test', (req, res) => {
-    const apiKey = req.headers['x-api-key'];
-    if (!process.env.ADMIN_API_KEY || apiKey !== process.env.ADMIN_API_KEY) {
-        return res.status(204).set('status', 'invalid').send();
-    }
-    res.status(204).set('status', 'valid').send();
-});
-
-
 export default router;
