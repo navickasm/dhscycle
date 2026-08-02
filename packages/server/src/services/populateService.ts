@@ -5,11 +5,11 @@ export async function populateDb(startDate: string, endDate: string): Promise<vo
     try {
         const dbRun = getDbRun();
 
-        const start = DateTime.fromISO(startDate).setZone('America/Chicago').toJSDate();
-        const end = DateTime.fromISO(endDate).setZone('America/Chicago').toJSDate();
+        const start = DateTime.fromISO(startDate, {zone: 'America/Chicago'}).startOf('day');
+        const end = DateTime.fromISO(endDate, {zone: 'America/Chicago'}).startOf('day');
 
-        for (let current = new Date(start); current <= end; current.setDate(current.getDate() + 1)) {
-            const dayOfWeek = current.getDay();
+        for (let current = start; current <= end; current = current.plus({days: 1})) {
+            const dayOfWeek = current.weekday;
             let regularity: string | null = null;
             switch (dayOfWeek) {
                 case 1:
@@ -31,7 +31,7 @@ export async function populateDb(startDate: string, endDate: string): Promise<vo
                     continue;
             }
 
-            const dateStr = current.toISOString().split('T')[0];
+            const dateStr = current.toISODate(); // Returns YYYY-MM-DD directly
 
             await dbRun(
                 `INSERT INTO schedules (date, regularity) VALUES (?, ?) ON CONFLICT(date) DO NOTHING;`,
