@@ -1,17 +1,8 @@
-import { getCentralTimeDateString } from './utils.js';
-import {CalendarCells} from "./routes/calendar.js";
+import {getCentralTimeDateString} from '../utils.js';
+import {CalendarCache, ScheduleCache} from "../types/cache.js";
+import {CalendarCells} from "../types/calendar.js";
 
 // TODO make more efficient, separate caches. Not a huge problem right now since it's a 3-second calc max for the first to visit the site of the day.
-interface ScheduleCache {
-    schedule: string | null;
-    timestamp: Date | null;
-}
-
-interface CalendarCache {
-    calendar: CalendarCells[] | null;
-    key: number | null;
-}
-
 export const scheduleCache: ScheduleCache = (() => {
     let _schedule: string | null = null;
 
@@ -63,6 +54,4 @@ export function invalidateCaches(): void {
     scheduleCache.timestamp = null;
     calendarCache.key = null;
     calendarCache.calendar = null;
-    console.log("Cache invalidated by admin request.");
 }
-

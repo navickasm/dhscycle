@@ -1,25 +1,8 @@
 import {Router} from 'express';
-import {getCentralTimeDateString} from '../utils.js';
-import {isCacheValid, scheduleCache} from '../cache.js';
-import {fetchScheduleFromDb, fetchWeekNamesFromDb, incrementCounter} from '../service.js';
-
-async function getBellScheduleForDate(dateStr: string): Promise<any> {
-    const todayDateStr = getCentralTimeDateString(new Date());
-
-    if (dateStr === todayDateStr && isCacheValid("schedule")) {
-        console.log(`Serving schedule for ${dateStr} from cache.`);
-        return scheduleCache.schedule!;
-    }
-
-    const scheduleJson = await fetchScheduleFromDb(dateStr);
-
-    if (dateStr === todayDateStr) {
-        scheduleCache.schedule = JSON.parse(scheduleJson || '{}');
-        return scheduleCache.schedule;
-    }
-
-    return JSON.parse(scheduleJson || '{}');
-}
+import {getCentralTimeDateString, isValidISODate} from '../utils.js';
+import {getBellScheduleForDate} from '../services/scheduleService.js';
+import {fetchWeekNamesFromDb} from '../services/weekService.js';
+import {incrementCounter} from '../services/analyticsService.js';
 
 const router = Router();
 
@@ -36,14 +19,13 @@ router.get('/schedule/currentDay', async (req, res) => {
 
 router.get('/schedule/:date', async (req, res) => {
     try {
-        await incrementCounter();
-
-        const requestedDateStr = req.params.date;
-
-        if (!requestedDateStr) {
+        if (!isValidISODate(req.params.date)) {
             return res.status(400).json({ message: 'Date parameter is required in the URL (e.g., /schedule/YYYY-MM-DD).' });
         }
-        const schedule = await getBellScheduleForDate(requestedDateStr);
+
+        await incrementCounter();
+
+        const schedule = await getBellScheduleForDate(req.params.date);
         return res.json(schedule);
     } catch (error) {
         console.error('Error in /schedule/:date:', error);
@@ -56,7 +38,7 @@ router.get('/thisWeek', async (req, res) => {
         const names = await fetchWeekNamesFromDb(getCentralTimeDateString(new Date()));
         return res.json(names);
     } catch (error) {
-        console.error('Error in /schedule/:date:', error);
+        console.error('Error in /thisWeek:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 });

@@ -2,50 +2,22 @@
 
 import Express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
 
-import scheduleRouter from './routes/schedule.js';
-import calendarRouter from './routes/calendar.js';
-import adminRouter from './routes/admin.js';
-import publicRouter from './routes/public.js';
+import routes from './routes/index.js';
+import {corsMiddleware} from './middleware/cors.js';
 import {closeDatabase, initializeDatabase} from "./database.js";
 
 dotenv.config();
 
 const app = Express();
 
-const allowedOrigins = [
-    'http://localhost:3000',
-    'https://www.dhscycle.com',
-    'http://www.dhscycle.com',
-    'https://dhscycle.com',
-    'http://dhscycle.com',
-];
-
-app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(corsMiddleware);
 
 initializeDatabase().then(r => {
     console.log("Database initialized successfully");
 })
 
-app.use(scheduleRouter);
-app.use(calendarRouter);
-app.use(adminRouter);
-app.use(publicRouter);
-
-// app.use((req, res) => {
-//     res.status(501).send();
-// });
+app.use(routes);
 
 app.listen(4000);
 

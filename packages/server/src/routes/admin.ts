@@ -1,19 +1,30 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
-import {populateDb} from '../service.js';
-import {invalidateCaches} from "../cache.js";
+import {DateTime} from 'luxon';
+import {populateDb} from '../services/populateService.js';
+import {invalidateCaches} from "../services/cacheService.js";
+import {adminAuth} from "../middleware/adminAuth.js";
+import {isValidISODate} from "../utils.js";
 
 const router = Router();
 
 dotenv.config();
 
-router.post('/admin/populate', async (req, res) => {
-    const apiKey = req.headers['x-api-key'];
-    if (!process.env.ADMIN_API_KEY || apiKey !== process.env.ADMIN_API_KEY) {
-        return res.status(403).json({ message: 'Forbidden: Invalid API Key' });
+router.post('/admin/populate', adminAuth, async (req, res) => {
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+
+    if (!isValidISODate(startDate)) {
+        return res.status(400).json({ message: 'Malformed Request: startDate must be a valid ISO date (YYYY-MM-DD)' });
+    }
+    if (!isValidISODate(endDate)) {
+        return res.status(400).json({ message: 'Malformed Request: endDate must be a valid ISO date (YYYY-MM-DD)' });
+    }
+    if (DateTime.fromISO(startDate) > DateTime.fromISO(endDate)) {
+        return res.status(400).json({ message: 'Malformed Request: startDate must be before or equal to endDate' });
     }
 
-    await populateDb(req.query.startDate as string, req.query.endDate as string).then(() => {
+    await populateDb(startDate, endDate).then(() => {
         res.status(200).json({ message: 'Database populated successfully.' });
     }).catch(error => {
         console.error('Error populating database:', error);
@@ -21,19 +32,13 @@ router.post('/admin/populate', async (req, res) => {
     });
 });
 
-router.post('/admin/invalidateCache', (req, res) => {
-    const apiKey = req.headers['x-api-key'];
-    if (!process.env.ADMIN_API_KEY || apiKey !== process.env.ADMIN_API_KEY) {
-        return res.status(403).json({ message: 'Forbidden: Invalid API Key' });
-    }
+router.post('/admin/invalidateCache', adminAuth, (req, res) => {
     invalidateCaches();
     res.status(200).json({ message: 'Caches invalidated successfully.' });
 });
 
 router.get('/admin/test', (req, res) => {
     const apiKey = req.headers['x-api-key'];
-    console.log(apiKey);
-    console.log(process.env.ADMIN_API_KEY);
     if (!process.env.ADMIN_API_KEY || apiKey !== process.env.ADMIN_API_KEY) {
         return res.status(204).set('status', 'invalid').send();
     }
