@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "outDir": "./packages/server/dist",
     "noImplicitAny": true,
-    "module": "nodenext",
+    "module": "esnext",
     "sourceMap": true,
     "target": "es2017",
     "experimentalDecorators": true,
@@ -29,12 +28,12 @@
     ],
     "paths": {
       "@/*": [
-        "./packages/client/src/*"
+        "./src/*"
       ]
     },
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "moduleResolution": "nodenext"
+    "moduleResolution": "bundler"
   },
   "include": [
     "**/*.ts",
