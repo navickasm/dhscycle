@@ -1,12 +1,20 @@
 import {DateTime} from 'luxon';
-import {getDbAll} from "../database.js";
+import {getDb} from "../database.js";
 import {parseScheduleData} from "../utils.js";
-import {CalendarCells, StartTime} from "../types/calendar.js";
+import {CalendarCells, ScheduleType, StartTime} from "../types/calendar.js";
 import {fetchRegularSchedule} from "./scheduleService.js";
 
-export async function getCalendarForMonth(month: number): Promise<CalendarCells[]> {
-    const dbAll = getDbAll();
+interface CalendarRow {
+    date: string;
+    regularity: string | null;
+    special_schedule_name: string | null;
+    special_schedule_h2: string | null;
+    special_schedule_base: string | null;
+    calendar_events: string | null;
+    schedule_json: string | null;
+}
 
+export function getCalendarForMonth(month: number): CalendarCells[] {
     try {
         const year = month >= 8 ? 2025 : 2026;
         const startDate = DateTime.fromObject({ year, month }).startOf('month').toISODate();
@@ -16,7 +24,7 @@ export async function getCalendarForMonth(month: number): Promise<CalendarCells[
             .plus({ days: DateTime.fromObject({ year, month }).endOf('month').weekday > 5 ? 7 : 0 }) // Adjust to next Friday if needed
             .toISODate();
 
-        const sql = `
+        const rows = getDb().prepare<[string, string], CalendarRow>(`
             SELECT
                 s.date,
                 s.regularity,
@@ -27,11 +35,9 @@ export async function getCalendarForMonth(month: number): Promise<CalendarCells[
                 s.schedule_json
             FROM schedules s
             WHERE s.date BETWEEN ? AND ?;
-        `;
-        const rows = await dbAll(sql, [startDate, endDate]);
-
-        // Map the database rows to CalendarCellProps
-        return Promise.all(rows.filter((row: any) => row.date).map(async (row: any) => {
+        `).all(startDate!, endDate!);
+        
+        return rows.filter(row => row.date).map(row => {
             const isNoSchool = row.regularity === "no" || (row.regularity === 'special' && !row.schedule_json);
             return isNoSchool
                 ? {
@@ -41,26 +47,26 @@ export async function getCalendarForMonth(month: number): Promise<CalendarCells[
                 }
                 : {
                     date: new Date(row.date).toISOString().split('T')[0],
-                    startTime: await getStartTime(row),
-                    scheduleType: row.regularity === "special"
+                    startTime: getStartTime(row),
+                    scheduleType: (row.regularity === "special"
                         ? (row.special_schedule_base && row.special_schedule_base !== "none" ? row.special_schedule_base : "other")
-                        : (row.regularity || "other"),
-                    specialNote: row.calendar_events,
+                        : (row.regularity || "other")) as ScheduleType,
+                    specialNote: row.calendar_events ?? undefined,
                     specialModifications: row.special_schedule_name ? row.special_schedule_name.split("%%").slice(1) : undefined,
                     isSpecial: row.regularity === "special",
                 };
-        }));
+        });
     } catch (error) {
         console.error(`Error fetching calendar for month ${month}:`, error);
         return [];
     }
 }
 
-async function getStartTime(row: any): Promise<StartTime> {
+function getStartTime(row: CalendarRow): StartTime {
     const schedule = row.schedule_json
         ? parseScheduleData(row.schedule_json)
         : row.regularity && row.regularity != "special"
-            ? parseScheduleData(await fetchRegularSchedule(row.regularity) || "[]")
+            ? parseScheduleData(fetchRegularSchedule(row.regularity) || "[]")
             : [];
 
     if (!Array.isArray(schedule)) {

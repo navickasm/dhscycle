@@ -9,21 +9,23 @@ import {closeDatabase, initializeDatabase} from "./database.js";
 
 dotenv.config();
 
+initializeDatabase();
+
 const app = Express();
 
 app.use(corsMiddleware);
-
-initializeDatabase().then(r => {
-    console.log("Database initialized successfully");
-})
-
 app.use(routes);
 
-app.listen(4000);
+app.listen(4000, () => {
+    console.log("API Server online");
+});
 
-console.log("API Server online");
+process.on('SIGINT', () => {
+    closeDatabase();
+    process.exit(0);
+});
 
-process.on('SIGINT', async () => {
-    await closeDatabase();
+process.on('SIGTERM', () => {
+    closeDatabase();
     process.exit(0);
 });

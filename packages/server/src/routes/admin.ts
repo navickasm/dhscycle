@@ -10,7 +10,7 @@ const router = Router();
 
 dotenv.config();
 
-router.post('/admin/populate', adminAuth, async (req, res) => {
+router.post('/admin/populate', adminAuth, (req, res) => {
     const startDate = req.query.startDate;
     const endDate = req.query.endDate;
 
@@ -24,12 +24,13 @@ router.post('/admin/populate', adminAuth, async (req, res) => {
         return res.status(400).json({ message: 'Malformed Request: startDate must be before or equal to endDate' });
     }
 
-    await populateDb(startDate, endDate).then(() => {
+    try {
+        populateDb(startDate, endDate);
         res.status(200).json({ message: 'Database populated successfully.' });
-    }).catch(error => {
+    } catch (error) {
         console.error('Error populating database:', error);
         res.status(500).json({ message: 'Internal Server Error' });
-    });
+    }
 });
 
 router.post('/admin/invalidateCache', adminAuth, (req, res) => {

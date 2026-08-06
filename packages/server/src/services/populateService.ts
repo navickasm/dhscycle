@@ -1,13 +1,17 @@
 import {DateTime} from 'luxon';
-import {getDbRun} from "../database.js";
+import {getDb} from "../database.js";
 
-export async function populateDb(startDate: string, endDate: string): Promise<void> {
-    try {
-        const dbRun = getDbRun();
+export function populateDb(startDate: string, endDate: string): void {
+    const db = getDb();
 
-        const start = DateTime.fromISO(startDate, {zone: 'America/Chicago'}).startOf('day');
-        const end = DateTime.fromISO(endDate, {zone: 'America/Chicago'}).startOf('day');
+    const start = DateTime.fromISO(startDate, {zone: 'America/Chicago'}).startOf('day');
+    const end = DateTime.fromISO(endDate, {zone: 'America/Chicago'}).startOf('day');
 
+    const insert = db.prepare(
+        `INSERT INTO schedules (date, regularity) VALUES (?, ?) ON CONFLICT(date) DO NOTHING;`
+    );
+
+    const insertRange = db.transaction(() => {
         for (let current = start; current <= end; current = current.plus({days: 1})) {
             const dayOfWeek = current.weekday;
             let regularity: string | null = null;
@@ -31,14 +35,9 @@ export async function populateDb(startDate: string, endDate: string): Promise<vo
                     continue;
             }
 
-            const dateStr = current.toISODate(); // Returns YYYY-MM-DD directly
-
-            await dbRun(
-                `INSERT INTO schedules (date, regularity) VALUES (?, ?) ON CONFLICT(date) DO NOTHING;`,
-                [dateStr, regularity]
-            );
+            insert.run(current.toISODate(), regularity);
         }
-    } catch (error) {
-        console.error(`Error populating db with default data from ${startDate} to ${endDate}:`, error);
-    }
+    });
+
+    insertRange();
 }
