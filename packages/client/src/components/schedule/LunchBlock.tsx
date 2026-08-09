@@ -7,9 +7,10 @@ import Timer from "./Timer.tsx";
 
 interface LunchBlockProps {
     times: LunchBlock;
+    showTimer?: boolean;
 }
 
-function Lunch({ period }: { period: any }) {
+function Lunch({ period, showTimer }: { period: any; showTimer?: boolean }) {
     return (
         <td className={styles.lunch}>
             <div style={{
@@ -27,7 +28,7 @@ function Lunch({ period }: { period: any }) {
                     {to12Hr(period.end)}
                 </span>
             </div>
-            <Timer start={period.start} end={period.end} />
+            {showTimer !== false && <Timer start={period.start} end={period.end} />}
         </td>
     );
 }
@@ -42,21 +43,21 @@ function NormalLunch(p: LunchBlockProps): JSX.Element {
     return (
         <>
             <tr>
-                <Lunch period={p.times.lunches[0]}/>
-                <PeriodBlockContent period={p.times.periods[0]} type={"big"}/>
+                <Lunch period={p.times.lunches[0]} showTimer={p.showTimer}/>
+                <PeriodBlockContent period={p.times.periods[0]} type={"big"} showTimer={p.showTimer}/>
             </tr>
             <tr>
-                <PeriodBlockContent period={p.times.periods[1]} type={"vertical"}/>
+                <PeriodBlockContent period={p.times.periods[1]} type={"vertical"} showTimer={p.showTimer}/>
             </tr>
             <tr>
-                <Lunch period={p.times.lunches[1]}/>
-                <PeriodBlockContent period={p.times.periods[2]} type={"vertical"}/>
+                <Lunch period={p.times.lunches[1]} showTimer={p.showTimer}/>
+                <PeriodBlockContent period={p.times.periods[2]} type={"vertical"} showTimer={p.showTimer}/>
             </tr>
             <tr>
-                <PeriodBlockContent period={p.times.periods[3]} type={"big"}/>
+                <PeriodBlockContent period={p.times.periods[3]} type={"big"} showTimer={p.showTimer}/>
             </tr>
             <tr>
-                <Lunch period={p.times.lunches[2]}/>
+                <Lunch period={p.times.lunches[2]} showTimer={p.showTimer}/>
             </tr>
         </>
     );
@@ -67,22 +68,22 @@ function FridayLunch(p: LunchBlockProps): JSX.Element {
         <>
             <tr>
                 <FakeLunch />
-                <PeriodBlockContent period={p.times.periods[0]} type={"big"}/>
+                <PeriodBlockContent period={p.times.periods[0]} type={"big"} showTimer={p.showTimer}/>
             </tr>
             <tr>
-                <Lunch period={p.times.lunches[0]}/>
+                <Lunch period={p.times.lunches[0]} showTimer={p.showTimer}/>
             </tr>
             <tr>
-                <Lunch period={p.times.lunches[1]}/>
-                <PeriodBlockContent period={p.times.periods[1]} type={"vertical"}/>
+                <Lunch period={p.times.lunches[1]} showTimer={p.showTimer}/>
+                <PeriodBlockContent period={p.times.periods[1]} type={"vertical"} showTimer={p.showTimer}/>
                 <FakeLunch />
             </tr>
             <tr>
                 <FakeLunch />
-                <PeriodBlockContent period={p.times.periods[2]} type={"vertical"}/>
+                <PeriodBlockContent period={p.times.periods[2]} type={"vertical"} showTimer={p.showTimer}/>
             </tr>
             <tr>
-                <Lunch period={p.times.lunches[2]}/>
+                <Lunch period={p.times.lunches[2]} showTimer={p.showTimer}/>
                 <FakeLunch />
             </tr>
         </>
@@ -91,9 +92,9 @@ function FridayLunch(p: LunchBlockProps): JSX.Element {
 
 export default function LunchBlock(p: LunchBlockProps) {
     if (p.times.type === "normal" || !p.times.type) {
-        return <NormalLunch times={p.times} />
+        return <NormalLunch times={p.times} showTimer={p.showTimer} />
     } else if (p.times.type === "friday") {
-        return <FridayLunch times={p.times} />
+        return <FridayLunch times={p.times} showTimer={p.showTimer} />
     } else {
         console.error("Problem with lunch block type:", p.times.type);
         return <></>;

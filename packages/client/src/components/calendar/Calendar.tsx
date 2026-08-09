@@ -4,6 +4,7 @@ import styles from "./calendar.module.css";
 
 export interface CalendarProps {
     cells: CalendarCellProps[];
+    onSelectDate?: (dateStr: string) => void;
 }
 
 export default function Calendar(p: CalendarProps) {
@@ -38,7 +39,13 @@ export default function Calendar(p: CalendarProps) {
                             return <td key={`padding-${cellIndex}`}/>;
                         }
                         const cell = p.cells[cellIndex - paddingNeeded];
-                        return cell ? <CalendarCell key={cellIndex} {...cell}/> : <td key={`empty-${cellIndex}`}/>;
+                        return cell ? (
+                            <CalendarCell
+                                key={cellIndex}
+                                {...cell}
+                                onSelect={p.onSelectDate ? () => p.onSelectDate!(cell.date.toISOString().split('T')[0]) : undefined}
+                            />
+                        ) : <td key={`empty-${cellIndex}`}/>;
                     })}
                 </tr>
             ))}

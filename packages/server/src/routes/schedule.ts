@@ -43,4 +43,18 @@ router.get('/thisWeek', async (req, res) => {
     }
 });
 
+router.get('/thisWeek/:date', async (req, res) => {
+    try {
+        if (!isValidISODate(req.params.date)) {
+            return res.status(400).json({ message: 'Date parameter is required in the URL (e.g., /thisWeek/YYYY-MM-DD).' });
+        }
+
+        const names = await fetchWeekNamesFromDb(req.params.date);
+        return res.json(names);
+    } catch (error) {
+        console.error('Error in /thisWeek/:date:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 export default router;

@@ -1,5 +1,7 @@
 import React, {JSX} from 'react';
 
+import styles from "./calendar.module.css";
+
 type ScheduleType = 'A' | '16' | '27' | '38' | '45' | 'other' | 's1finals' | 's2finals';
 type StartTime = '8:20' | '8:40' | 'other';
 
@@ -13,7 +15,9 @@ export type CalendarCellProps =
     isSpecial?: boolean;
     isNoSchool?: false;
     noSchoolReason?: never;
-    highlighted: boolean;
+    isToday?: boolean;
+    isSelected?: boolean;
+    onSelect?: () => void;
 }
     | { // No school
     date: Date;
@@ -24,7 +28,9 @@ export type CalendarCellProps =
     scheduleType?: never;
     isNoSchool: true;
     noSchoolReason?: string;
-    highlighted: boolean;
+    isToday?: boolean;
+    isSelected?: boolean;
+    onSelect?: () => void;
 };
 
 const scheduleTypeColors: { [key in ScheduleType | 'default']?: string } = {
@@ -109,17 +115,28 @@ function NoSchoolBottom(p: CalendarCellProps): JSX.Element {
 export function CalendarCell(p: CalendarCellProps): JSX.Element {
     const dayNumber = p.date.getUTCDate();
 
+    const border = p.isToday
+        ? '3px solid var(--main)'
+        : p.isSelected
+            ? '3px dashed var(--main)'
+            : undefined;
+
     // TODO make the specialNote more efficient
     return (
         <>
-            <td style={{
-                height: '7rem',
-                padding: '0.5rem',
-                width: '140px',
-                minWidth: '140px',
-                backgroundColor: scheduleTypeColorsPastel[p.scheduleType ?? 'default'],
-                border: p.highlighted ? '3px solid var(--main)' : undefined,
-            }}>
+            <td
+                className={p.onSelect ? styles.clickableCell : undefined}
+                onClick={p.onSelect}
+                title={p.isToday ? "Today" : "Click to view this day's schedule"}
+                style={{
+                    height: '7rem',
+                    padding: '0.5rem',
+                    width: '140px',
+                    minWidth: '140px',
+                    backgroundColor: scheduleTypeColorsPastel[p.scheduleType ?? 'default'],
+                    border: border,
+                    cursor: p.onSelect ? 'pointer' : undefined,
+                }}>
                 <div style={{
                     display: 'flex',
                     flexDirection: 'column',

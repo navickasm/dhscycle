@@ -9,6 +9,7 @@ export interface PeriodBlockProps {
         end: string;
     };
     type?: "normal" | "vertical" | "big" | "horiz";
+    showTimer?: boolean;
 }
 
 export function to12Hr(time24: string): string {
@@ -47,7 +48,7 @@ export function PeriodBlockContent(p: PeriodBlockProps): JSX.Element {
                     {to12Hr(p.period.start)}–{ (p.type === "vertical" || p.type === "big") && (<br/>)}{to12Hr(p.period.end)}
                 </span>
             </div>
-            <Timer start={p.period.start} end={p.period.end} />
+            {p.showTimer !== false && <Timer start={p.period.start} end={p.period.end} />}
         </td>
     );
 }
