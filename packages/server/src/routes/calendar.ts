@@ -1,6 +1,5 @@
 import {Router} from "express";
 import {getCalendarForMonth} from "../services/calendarService.js";
-import {calendarCache, isCacheValid} from "../services/cacheService.js";
 
 const router = Router();
 
@@ -14,15 +13,7 @@ router.get('/calendar/:month', async (req, res) => {
             return res.status(400).json({ message: 'Malformed Request: month must be between 1 and 12' });
         }
 
-        const currentMonth = new Date().getUTCMonth() + 1;
-
-        if (monthNumber == currentMonth && isCacheValid("calendar")) {
-            return res.status(200).json(calendarCache.calendar);
-        }
-
-        const calendarData = await getCalendarForMonth(monthNumber);
-
-        calendarCache.calendar = calendarData;
+        const calendarData = getCalendarForMonth(monthNumber);
         res.status(200).json(calendarData);
     } catch (error) {
         console.error('Error serving calendar:', error);

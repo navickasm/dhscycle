@@ -1,57 +1,70 @@
 import {getCentralTimeDateString} from '../utils.js';
-import {CalendarCache, ScheduleCache} from "../types/cache.js";
 import {CalendarCells} from "../types/calendar.js";
+import {WeekDayName} from "../types/schedule.js";
 
-// TODO make more efficient, separate caches. Not a huge problem right now since it's a 3-second calc max for the first to visit the site of the day.
-export const scheduleCache: ScheduleCache = (() => {
-    let _schedule: string | null = null;
+const scheduleCache = new Map<string, any>();
+const calendarCache = new Map<number, CalendarCells[]>();
+const weekCache = new Map<string, WeekDayName[]>();
 
-    return {
-        get schedule() {
-            return _schedule;
-        },
-        set schedule(value: string | null) {
-            _schedule = value;
-            this.timestamp = value ? new Date(Date.now()) : null;
-        },
-        timestamp: null
-    };
-})();
+let cacheDay: string | null = null;
 
-export const calendarCache: CalendarCache = (() => {
-    let _calendar: CalendarCells[] | null = null;
+let warm: (() => void) | null = null;
 
-    return {
-        get calendar() {
-            return _calendar;
-        },
-        set calendar(value: CalendarCells[] | null) {
-            _calendar = value;
-            this.key = value ? new Date(Date.now()).getUTCMonth() : null;
-        },
-        key: null,
-        timestamp: null
-    };
-})();
-
-export function isCacheValid(cacheType: "schedule" | "calendar"): boolean {
-    if (cacheType === "schedule") {
-        if (scheduleCache.schedule === null || scheduleCache.timestamp === null) return false;
-        const currentCentralDayStr = getCentralTimeDateString(new Date());
-        const cachedDateCentralDayStr = getCentralTimeDateString(scheduleCache.timestamp);
-        return cachedDateCentralDayStr === currentCentralDayStr;
-    } else if (cacheType === "calendar") {
-        if (calendarCache.calendar === null || calendarCache.key === null) return false;
-        const currentMonth = new Date().getUTCMonth();
-        return calendarCache.key === currentMonth;
-    }
-    return false;
+export function registerCacheWarmer(fn: () => void): void {
+    warm = fn;
 }
 
-// TODO add specific cache invalidation strategies
+function ensureFresh(): void {
+    const today = getCentralTimeDateString(new Date());
+    if (cacheDay !== today) {
+        scheduleCache.clear();
+        calendarCache.clear();
+        weekCache.clear();
+        cacheDay = today;
+    }
+}
+
+export function getCachedSchedule(dateStr: string): any | undefined {
+    ensureFresh();
+    return scheduleCache.get(dateStr);
+}
+
+export function setCachedSchedule(dateStr: string, value: any): void {
+    ensureFresh();
+    scheduleCache.set(dateStr, value);
+}
+
+export function getCachedCalendar(month: number): CalendarCells[] | undefined {
+    ensureFresh();
+    return calendarCache.get(month);
+}
+
+export function setCachedCalendar(month: number, value: CalendarCells[]): void {
+    ensureFresh();
+    calendarCache.set(month, value);
+}
+
+export function getCachedWeek(weekStart: string): WeekDayName[] | undefined {
+    ensureFresh();
+    return weekCache.get(weekStart);
+}
+
+export function setCachedWeek(weekStart: string, value: WeekDayName[]): void {
+    ensureFresh();
+    weekCache.set(weekStart, value);
+}
+
 export function invalidateCaches(): void {
-    scheduleCache.schedule = null;
-    scheduleCache.timestamp = null;
-    calendarCache.key = null;
-    calendarCache.calendar = null;
+    scheduleCache.clear();
+    calendarCache.clear();
+    weekCache.clear();
+    cacheDay = getCentralTimeDateString(new Date());
+
+    if (warm) {
+        try {
+            warm();
+        } catch (error) {
+            console.error('Error warming caches after invalidation:', error);
+        }
+    }
 }

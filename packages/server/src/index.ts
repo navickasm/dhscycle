@@ -6,10 +6,12 @@ import dotenv from 'dotenv';
 import routes from './routes/index.js';
 import {corsMiddleware} from './middleware/cors.js';
 import {closeDatabase, initializeDatabase} from "./database.js";
+import {setupCacheWarming} from "./services/warmupService.js";
 
 dotenv.config();
 
 initializeDatabase();
+setupCacheWarming();
 
 const app = Express();
 

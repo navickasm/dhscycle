@@ -1,7 +1,7 @@
 import {DateTime} from 'luxon';
 import {getDb} from "../database.js";
-import {getCentralTimeDateString, parseScheduleData} from "../utils.js";
-import {isCacheValid, scheduleCache} from "./cacheService.js";
+import {parseScheduleData} from "../utils.js";
+import {getCachedSchedule, setCachedSchedule} from "./cacheService.js";
 import {FullSchedule} from "../types/schedule.js";
 
 interface RegularScheduleRow {
@@ -78,18 +78,14 @@ export function fetchScheduleFromDb(dateStr: string): string {
 }
 
 export function getBellScheduleForDate(dateStr: string): any {
-    const todayDateStr = getCentralTimeDateString(new Date());
-
-    if (dateStr === todayDateStr && isCacheValid("schedule")) {
-        return scheduleCache.schedule!;
+    const cached = getCachedSchedule(dateStr);
+    if (cached !== undefined) {
+        return cached;
     }
 
     const scheduleJson = fetchScheduleFromDb(dateStr);
+    const schedule = JSON.parse(scheduleJson || '{}');
 
-    if (dateStr === todayDateStr) {
-        scheduleCache.schedule = JSON.parse(scheduleJson || '{}');
-        return scheduleCache.schedule;
-    }
-
-    return JSON.parse(scheduleJson || '{}');
+    setCachedSchedule(dateStr, schedule);
+    return schedule;
 }

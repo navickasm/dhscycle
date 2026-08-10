@@ -1,11 +1,28 @@
 import {DateTime} from 'luxon';
 import {getDb} from "../database.js";
 import {WeekDayName} from "../types/schedule.js";
+import {getCachedWeek, setCachedWeek} from "./cacheService.js";
 
 interface WeekRow {
     date: string;
     regularity: string;
     schedule_name: string | null;
+}
+
+export function getWeekNames(dateStr: string): WeekDayName[] {
+    if (!dateStr) throw new Error("Date string is required.");
+
+    const weekStart = DateTime.fromISO(dateStr).plus({days: 2}).set({weekday: 1}).toISODate();
+    if (!weekStart) throw new Error("Invalid date string.");
+
+    const cached = getCachedWeek(weekStart);
+    if (cached !== undefined) {
+        return cached;
+    }
+
+    const week = fetchWeekNamesFromDb(dateStr);
+    setCachedWeek(weekStart, week);
+    return week;
 }
 
 export function fetchWeekNamesFromDb(dateStr: string): WeekDayName[] {

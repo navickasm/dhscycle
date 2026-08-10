@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {getCentralTimeDateString, isValidISODate} from '../utils.js';
 import {getBellScheduleForDate} from '../services/scheduleService.js';
-import {fetchWeekNamesFromDb} from '../services/weekService.js';
+import {getWeekNames} from '../services/weekService.js';
 import {incrementCounter} from '../services/analyticsService.js';
 
 const router = Router();
@@ -35,7 +35,7 @@ router.get('/schedule/:date', async (req, res) => {
 
 router.get('/thisWeek', async (req, res) => {
     try {
-        const names = await fetchWeekNamesFromDb(getCentralTimeDateString(new Date()));
+        const names = getWeekNames(getCentralTimeDateString(new Date()));
         return res.json(names);
     } catch (error) {
         console.error('Error in /thisWeek:', error);
@@ -49,7 +49,7 @@ router.get('/thisWeek/:date', async (req, res) => {
             return res.status(400).json({ message: 'Date parameter is required in the URL (e.g., /thisWeek/YYYY-MM-DD).' });
         }
 
-        const names = await fetchWeekNamesFromDb(req.params.date);
+        const names = getWeekNames(req.params.date);
         return res.json(names);
     } catch (error) {
         console.error('Error in /thisWeek/:date:', error);
