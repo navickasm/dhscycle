@@ -154,7 +154,7 @@ export default function Calendar(p: CalendarProps) {
                 disabled={p.monthIndex! <= 0}
                 aria-label="Previous month"
             >
-                ◀
+                {'\u25C0\uFE0E'}
             </button>
             <MonthDropdown
                 months={p.months!}
@@ -169,7 +169,7 @@ export default function Calendar(p: CalendarProps) {
                 disabled={p.monthIndex! >= p.months!.length - 1}
                 aria-label="Next month"
             >
-                ▶
+                {'\u25B6\uFE0E'}
             </button>
         </div>
     ) : (
