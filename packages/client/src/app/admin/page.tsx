@@ -97,31 +97,6 @@ export default function AdminCalendarPage() {
         setErrors(prev => prev.includes(message) ? prev : [...prev, message]);
     }, []);
 
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const res = await adminFetch('/admin/settings');
-                if (!res.ok) {
-                    addError(`Failed to load settings from GET /admin/settings: HTTP ${res.status} ${res.statusText}`);
-                    return;
-                }
-                const settings: Record<string, string | null> = await res.json();
-                const start = settings.school_year_start;
-                const end = settings.school_year_end;
-                if (!start || !end) {
-                    const missing = [
-                        !start && 'school_year_start',
-                        !end && 'school_year_end',
-                    ].filter(Boolean).join(', ');
-                    addError(`Missing required setting(s): ${missing}. Set them on the Settings page.`);
-                }
-            } catch (err) {
-                addError(`Failed to load settings from GET /admin/settings: ${err instanceof Error ? err.message : String(err)}`);
-            }
-        };
-        load();
-    }, [addError]);
-
     const currentMonth = months[monthIndex] ?? null;
 
     useEffect(() => {

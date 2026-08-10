@@ -3,8 +3,8 @@ import {getDb} from "../database.js";
 import {parseScheduleData} from "../utils.js";
 import {CalendarCells, ScheduleType, StartTime} from "../types/calendar.js";
 import {fetchRegularSchedule} from "./scheduleService.js";
-import {getSettings} from "./adminService.js";
 import {getCachedCalendar, setCachedCalendar} from "./cacheService.js";
+import {getYearForMonth} from "./schoolYearService.js";
 
 interface CalendarRow {
     date: string;
@@ -14,20 +14,6 @@ interface CalendarRow {
     special_schedule_base: string | null;
     calendar_events: string | null;
     schedule_json: string | null;
-}
-
-function getYearForMonth(month: number): number {
-    try {
-        const settings = getSettings();
-        const start = settings['school_year_start'] ? DateTime.fromISO(settings['school_year_start']) : null;
-        const end = settings['school_year_end'] ? DateTime.fromISO(settings['school_year_end']) : null;
-        if (start?.isValid && end?.isValid) {
-            return month >= start.month ? start.year : end.year;
-        }
-    } catch (error) {
-        console.error('Error reading school year settings, falling back to defaults:', error);
-    }
-    return month >= 8 ? 2026 : 2027;
 }
 
 export function getCalendarForMonth(month: number): CalendarCells[] {

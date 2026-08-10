@@ -125,29 +125,6 @@ router.get('/admin/specialDays', (req, res) => {
     }
 });
 
-router.get('/admin/settings', (req, res) => {
-    try {
-        res.status(200).json(adminService.getSettings());
-    } catch (error) {
-        console.error('Error fetching settings:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
-    }
-});
-
-router.put('/admin/settings', (req, res) => {
-    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
-        return res.status(400).json({ message: 'Malformed Request: body must be an object of key/value pairs' });
-    }
-    try {
-        adminService.setSettings(req.body);
-        invalidateCaches();
-        res.status(200).json(adminService.getSettings());
-    } catch (error) {
-        console.error('Error saving settings:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
-    }
-});
-
 router.get('/admin/templates', (req, res) => {
     try {
         res.status(200).json(adminService.listTemplates());

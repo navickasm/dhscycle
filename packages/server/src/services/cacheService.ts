@@ -1,4 +1,5 @@
 import {getCentralTimeDateString} from '../utils.js';
+import {recomputeSchoolYear} from './schoolYearService.js';
 import {CalendarCells} from "../types/calendar.js";
 import {WeekDayName} from "../types/schedule.js";
 
@@ -55,6 +56,7 @@ export function setCachedWeek(weekStart: string, value: WeekDayName[]): void {
 }
 
 export function invalidateCaches(): void {
+    recomputeSchoolYear();
     scheduleCache.clear();
     calendarCache.clear();
     weekCache.clear();

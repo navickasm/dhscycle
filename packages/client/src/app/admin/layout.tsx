@@ -7,7 +7,6 @@ const navLinks = [
     {href: '/admin', label: 'Calendar'},
     {href: '/admin/templates', label: 'Templates'},
     {href: '/admin/tools', label: 'Tools'},
-    {href: '/admin/settings', label: 'Settings'},
 ];
 
 function LoginForm({onSuccess}: { onSuccess: () => void }) {

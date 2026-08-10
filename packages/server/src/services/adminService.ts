@@ -94,27 +94,6 @@ export function deleteDay(date: string): boolean {
     return result.changes > 0;
 }
 
-export function getSettings(): Record<string, string | null> {
-    const rows = getDb().prepare<[], { key: string; value: string | null }>(
-        `SELECT key, value FROM settings;`
-    ).all();
-    return Object.fromEntries(rows.map(r => [r.key, r.value]));
-}
-
-export function setSettings(settings: Record<string, string | null>): void {
-    const db = getDb();
-    const stmt = db.prepare(
-        `INSERT INTO settings (key, value) VALUES (?, ?)
-         ON CONFLICT(key) DO UPDATE SET value = excluded.value;`
-    );
-    const tx = db.transaction(() => {
-        for (const [key, value] of Object.entries(settings)) {
-            stmt.run(key, value);
-        }
-    });
-    tx();
-}
-
 export interface TemplateRow {
     id: number;
     name: string;
