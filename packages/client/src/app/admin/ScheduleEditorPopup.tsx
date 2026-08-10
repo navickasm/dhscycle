@@ -1,11 +1,9 @@
 'use client';
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {LunchBlock, Period, TimeBlock} from '../../schedule.ts';
 import {adminFetch} from './adminApi.ts';
 import SpecialWizard, {WizardResult} from './SpecialWizard.tsx';
-
-type ScheduleBlock = TimeBlock | LunchBlock;
+import ScheduleBlocksEditor, {parseBlocks, ScheduleBlock, validateBlocks} from './ScheduleBlocksEditor.tsx';
 
 const REGULARITIES = ['A', '16', '27', '38', '45'] as const;
 type Regularity = typeof REGULARITIES[number];
@@ -29,75 +27,6 @@ interface ScheduleEditorPopupProps {
     onSaved?: () => void;
 }
 
-function isLunchBlock(block: ScheduleBlock): block is LunchBlock {
-    return (block as LunchBlock).lunchBlock === true;
-}
-
-function parseBlocks(json: string | null): ScheduleBlock[] {
-    if (!json) return [];
-    try {
-        const parsed = JSON.parse(json.replace(/\\"/g, '"'));
-        return Array.isArray(parsed) ? parsed : [];
-    } catch (err) {
-        console.error('Failed to parse schedule JSON:', err);
-        return [];
-    }
-}
-
-function makeLunchBlockSkeleton(): LunchBlock {
-    return {
-        lunchBlock: true,
-        type: 'normal',
-        periods: [
-            {period: Period.FOUR_A, start: '', end: ''},
-            {period: Period.FOUR_B, start: '', end: ''},
-            {period: Period.FIVE_A, start: '', end: ''},
-            {period: Period.FIVE_B, start: '', end: ''},
-        ],
-        lunches: [
-            {period: Period.L1, start: '', end: ''},
-            {period: Period.L2, start: '', end: ''},
-            {period: Period.L3, start: '', end: ''},
-        ],
-    };
-}
-
-function convertLunchBlockType(block: LunchBlock, type: LunchBlock['type']): LunchBlock {
-    if (type === block.type) return block;
-    const periodLabels = type === 'friday'
-        ? [Period.SIX_A, Period.SIX_B]
-        : [Period.FOUR_A, Period.FOUR_B, Period.FIVE_A, Period.FIVE_B];
-    const lunchLabels = type === 'friday'
-        ? [Period.LA, Period.LB, Period.LC]
-        : [Period.L1, Period.L2, Period.L3];
-    return {
-        ...block,
-        type,
-        periods: periodLabels.map((p, i) => ({
-            period: p,
-            start: block.periods[i]?.start ?? '',
-            end: block.periods[i]?.end ?? '',
-        })),
-        lunches: lunchLabels.map((p, i) => ({
-            period: p,
-            start: block.lunches[i]?.start ?? '',
-            end: block.lunches[i]?.end ?? '',
-        })),
-    };
-}
-
-// Canonical ordering of blocks within a day. 'LUNCH' represents the lunch block.
-const BLOCK_ORDER: string[] = [
-    Period.EB, Period.SC, Period.HR, Period.PEP, Period.ONE, Period.TWO, Period.THREE,
-    'LUNCH', Period.SIX, Period.SEVEN, Period.EIGHT,
-];
-
-function blockOrderIndex(block: ScheduleBlock): number {
-    const key = isLunchBlock(block) ? 'LUNCH' : block.period;
-    const idx = BLOCK_ORDER.indexOf(key);
-    return idx === -1 ? BLOCK_ORDER.length : idx;
-}
-
 function predictRegularity(date: string): Regularity {
     const day = new Date(`${date}T00:00:00Z`).getUTCDay();
     switch (day) {
@@ -108,11 +37,6 @@ function predictRegularity(date: string): Regularity {
         default: return 'A';
     }
 }
-
-const PALETTE_PERIODS: Period[] = [
-    Period.EB, Period.ONE, Period.TWO, Period.THREE, Period.SIX, Period.SEVEN, Period.EIGHT,
-    Period.HR, Period.SC, Period.PEP,
-];
 
 const inputStyle: React.CSSProperties = {
     padding: '0.25rem 0.4rem',
@@ -129,142 +53,6 @@ const labelStyle: React.CSSProperties = {
     fontSize: '0.85rem',
     color: '#444',
 };
-
-function TimeInputs({block, disabled, onChange}: {
-    block: TimeBlock;
-    disabled: boolean;
-    onChange: (updated: TimeBlock) => void;
-}) {
-    return (
-        <span style={{display: 'inline-flex', alignItems: 'center', gap: '0.3rem'}}>
-            <input
-                type="time"
-                value={block.start}
-                disabled={disabled}
-                onChange={e => onChange({...block, start: e.target.value})}
-                style={inputStyle}
-            />
-            –
-            <input
-                type="time"
-                value={block.end}
-                disabled={disabled}
-                onChange={e => onChange({...block, end: e.target.value})}
-                style={inputStyle}
-            />
-        </span>
-    );
-}
-
-function BlockCard({block, index, dragIndex, editable, onDragStart, onDragOver, onDrop, onDragEnd, onChange, onRemove, onBeginEdit}: {
-    block: ScheduleBlock;
-    index: number;
-    dragIndex: number | null;
-    editable: boolean;
-    onDragStart: (index: number) => void;
-    onDragOver: (e: React.DragEvent, index: number) => void;
-    onDrop: (index: number) => void;
-    onDragEnd: () => void;
-    onChange: (index: number, updated: ScheduleBlock) => void;
-    onRemove: (index: number) => void;
-    onBeginEdit: () => void;
-}) {
-    const isDragging = dragIndex === index;
-
-    const updateInner = (list: 'periods' | 'lunches', i: number, updated: TimeBlock) => {
-        if (!isLunchBlock(block)) return;
-        const next = {...block, [list]: block[list].map((tb, idx) => idx === i ? updated : tb)};
-        onChange(index, next);
-    };
-
-    return (
-        <div
-            draggable
-            onDragStart={() => {
-                onBeginEdit();
-                onDragStart(index);
-            }}
-            onDragOver={e => onDragOver(e, index)}
-            onDrop={() => onDrop(index)}
-            onDragEnd={onDragEnd}
-            onMouseDown={editable ? undefined : onBeginEdit}
-            style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '0.6rem',
-                padding: '0.5rem 0.6rem',
-                border: '1px solid #ccc',
-                borderRadius: '6px',
-                backgroundColor: isDragging ? '#e8f0fe' : '#ffffff',
-                opacity: isDragging ? 0.5 : 1,
-                cursor: 'grab',
-                userSelect: 'none',
-            }}
-        >
-            <span style={{color: '#999', fontSize: '1.1rem', lineHeight: 1.6}} aria-hidden>⠿</span>
-
-            {isLunchBlock(block) ? (
-                <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem'}}>
-                    <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                        <span style={{fontWeight: 'bold'}}>Lunch Block</span>
-                        <select
-                            value={block.type}
-                            disabled={!editable}
-                            onChange={e => onChange(index, convertLunchBlockType(block, e.target.value as LunchBlock['type']))}
-                            style={inputStyle}
-                        >
-                            <option value="normal">normal</option>
-                            <option value="friday">friday</option>
-                        </select>
-                    </div>
-                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.25rem'}}>
-                        {block.periods.map((tb, i) => (
-                            <div key={`p-${i}`} style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                                <span style={{minWidth: '2.2rem', fontWeight: 'bold', fontSize: '0.85rem'}}>{tb.period}</span>
-                                <TimeInputs block={tb} disabled={!editable} onChange={u => updateInner('periods', i, u)}/>
-                            </div>
-                        ))}
-                        {block.lunches.map((tb, i) => (
-                            <div key={`l-${i}`} style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                                <span style={{minWidth: '2.2rem', fontWeight: 'bold', fontSize: '0.85rem', color: '#996600'}}>{tb.period}</span>
-                                <TimeInputs block={tb} disabled={!editable} onChange={u => updateInner('lunches', i, u)}/>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ) : (
-                <div style={{flex: 1, display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap'}}>
-                    <input
-                        type="text"
-                        value={block.period}
-                        disabled={!editable}
-                        onChange={e => onChange(index, {...block, period: e.target.value as Period})}
-                        style={{...inputStyle, width: '3.2rem', fontWeight: 'bold'}}
-                        aria-label="Period"
-                    />
-                    <TimeInputs block={block} disabled={!editable} onChange={u => onChange(index, u as ScheduleBlock)}/>
-                </div>
-            )}
-
-            <button
-                onClick={() => onRemove(index)}
-                aria-label="Remove block"
-                title="Remove block"
-                style={{
-                    border: 'none',
-                    background: 'none',
-                    color: '#cc0000',
-                    fontSize: '1.1rem',
-                    cursor: 'pointer',
-                    lineHeight: 1.4,
-                    padding: '0 0.2rem',
-                }}
-            >
-                ✕
-            </button>
-        </div>
-    );
-}
 
 export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEditorPopupProps) {
     const [loading, setLoading] = useState(true);
@@ -285,7 +73,7 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
     const [trulySpecial, setTrulySpecial] = useState(false);
     const [showWizard, setShowWizard] = useState(false);
 
-    const [dragIndex, setDragIndex] = useState<number | null>(null);
+    const [dragging, setDragging] = useState(false);
     const [dirty, setDirty] = useState(false);
     const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -401,57 +189,13 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
         setDirty(true);
     };
 
-    const handleBlockChange = (index: number, updated: ScheduleBlock) => {
-        promoteToSpecial();
-        setBlocks(prev => prev.map((b, i) => i === index ? updated : b));
+    const handleBlocksChange = (next: ScheduleBlock[]) => {
+        setBlocks(next);
         setDirty(true);
     };
-
-    const handleBlockRemove = (index: number) => {
-        promoteToSpecial();
-        setBlocks(prev => prev.filter((_, i) => i !== index));
-        setDirty(true);
-    };
-
-    const handleAddBlock = (block: ScheduleBlock) => {
-        promoteToSpecial();
-        setBlocks(prev => {
-            const order = blockOrderIndex(block);
-            let insertAt = prev.length;
-            for (let i = 0; i < prev.length; i++) {
-                if (blockOrderIndex(prev[i]) > order) {
-                    insertAt = i;
-                    break;
-                }
-            }
-            const next = [...prev];
-            next.splice(insertAt, 0, block);
-            return next;
-        });
-        setDirty(true);
-    };
-
-    const handleDragStart = (index: number) => setDragIndex(index);
-    const handleDragOver = (e: React.DragEvent, index: number) => e.preventDefault();
-    const handleDrop = (index: number) => {
-        if (dragIndex === null || dragIndex === index) {
-            setDragIndex(null);
-            return;
-        }
-        promoteToSpecial();
-        setBlocks(prev => {
-            const next = [...prev];
-            const [moved] = next.splice(dragIndex, 1);
-            next.splice(index, 0, moved);
-            return next;
-        });
-        setDirty(true);
-        setDragIndex(null);
-    };
-    const handleDragEnd = () => setDragIndex(null);
 
     const handleDialogDragOver = (e: React.DragEvent) => {
-        if (dragIndex === null) return;
+        if (!dragging) return;
         const el = dialogRef.current;
         if (!el) return;
         const rect = el.getBoundingClientRect();
@@ -465,15 +209,7 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
 
     const validationError = useMemo((): string | null => {
         if (dayType !== 'special') return null;
-        for (const block of blocks) {
-            const inner: TimeBlock[] = isLunchBlock(block) ? [...block.periods, ...block.lunches] : [block];
-            for (const tb of inner) {
-                if (!tb.period) return 'Every block needs a period label.';
-                if (!tb.start || !tb.end) return `Block "${tb.period}" is missing a start or end time.`;
-                if (tb.start >= tb.end) return `Block "${tb.period}" must start before it ends.`;
-            }
-        }
-        return null;
+        return validateBlocks(blocks);
     }, [dayType, blocks]);
 
     const handleSave = async (): Promise<boolean> => {
@@ -777,80 +513,13 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
                         )}
 
                         {dayType === 'special' && (
-                            <>
-                                {blocks.length === 0 ? (
-                                    <p style={{
-                                        textAlign: 'center',
-                                        padding: '1.25rem',
-                                        border: '2px dashed #ccc',
-                                        borderRadius: '8px',
-                                        color: '#888',
-                                        margin: 0,
-                                    }}>
-                                        No schedule blocks. Add some below.
-                                    </p>
-                                ) : (
-                                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
-                                        {blocks.map((block, index) => (
-                                            <BlockCard
-                                                key={index}
-                                                block={block}
-                                                index={index}
-                                                dragIndex={dragIndex}
-                                                editable={blocksEditable}
-                                                onDragStart={handleDragStart}
-                                                onDragOver={handleDragOver}
-                                                onDrop={handleDrop}
-                                                onDragEnd={handleDragEnd}
-                                                onChange={handleBlockChange}
-                                                onRemove={handleBlockRemove}
-                                                onBeginEdit={promoteToSpecial}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-
-                                <div>
-                                    <p style={{margin: '0 0 0.3rem', fontWeight: 'bold', fontSize: '0.85rem', color: '#444'}}>
-                                        Add block:
-                                    </p>
-                                    <div style={{display: 'flex', gap: '0.3rem', flexWrap: 'wrap'}}>
-                                        {PALETTE_PERIODS.map(p => (
-                                            <button
-                                                key={p}
-                                                onClick={() => handleAddBlock({period: p, start: '', end: ''})}
-                                                style={{
-                                                    padding: '0.25rem 0.6rem',
-                                                    font: 'inherit',
-                                                    fontSize: '0.85rem',
-                                                    cursor: 'pointer',
-                                                    border: '1px dashed #999',
-                                                    borderRadius: '5px',
-                                                    backgroundColor: '#fafafa',
-                                                    color: '#333',
-                                                }}
-                                            >
-                                                + {p}
-                                            </button>
-                                        ))}
-                                        <button
-                                            onClick={() => handleAddBlock(makeLunchBlockSkeleton())}
-                                            style={{
-                                                padding: '0.25rem 0.6rem',
-                                                font: 'inherit',
-                                                fontSize: '0.85rem',
-                                                cursor: 'pointer',
-                                                border: '1px dashed #996600',
-                                                borderRadius: '5px',
-                                                backgroundColor: '#fffaf0',
-                                                color: '#996600',
-                                            }}
-                                        >
-                                            + Lunch Block
-                                        </button>
-                                    </div>
-                                </div>
-                            </>
+                            <ScheduleBlocksEditor
+                                blocks={blocks}
+                                onChange={handleBlocksChange}
+                                editable={blocksEditable}
+                                onBeginEdit={promoteToSpecial}
+                                onDragStateChange={setDragging}
+                            />
                         )}
 
                         <label style={labelStyle}>
