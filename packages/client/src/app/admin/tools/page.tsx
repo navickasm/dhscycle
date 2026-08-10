@@ -185,12 +185,49 @@ function PopulateTool() {
     );
 }
 
+function InvalidateCachesTool() {
+    const [busy, setBusy] = useState(false);
+    const [status, setStatus] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const run = async () => {
+        setBusy(true);
+        setError(null);
+        setStatus(null);
+        try {
+            const res = await adminFetch('/admin/invalidateCache', {method: 'POST'});
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                throw new Error(data?.message ?? `HTTP error! status: ${res.status}`);
+            }
+            setStatus('Ok');
+        } catch (err) {
+            console.error('Invalidate caches error:', err);
+            setError(err instanceof Error ? err.message : 'Something went wrong.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    return (
+        <section style={sectionStyle}>
+            <h2 style={{margin: 0, fontSize: '1.1rem'}}>Invalidate Caches</h2>
+            <button onClick={() => void run()} disabled={busy} style={{...buttonStyle, backgroundColor: '#b3261e', opacity: busy ? 0.6 : 1}}>
+                {busy ? 'Invalidating…' : 'Invalidate All Caches'}
+            </button>
+            {status && <p style={{margin: 0, fontSize: '0.85rem', color: '#1a7a1a'}}>{status}</p>}
+            {error && <p style={{margin: 0, fontSize: '0.85rem', color: 'red'}}>{error}</p>}
+        </section>
+    );
+}
+
 export default function AdminToolsPage() {
     return (
         <div style={{display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '720px'}}>
             <h1 style={{margin: 0}}>Tools</h1>
             <BreakWizard/>
             <PopulateTool/>
+            <InvalidateCachesTool/>
         </div>
     );
 }
