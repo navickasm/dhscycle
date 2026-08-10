@@ -12,17 +12,12 @@
   },
   "type": "module",
   "devDependencies": {
-    "@types/react": "^19.1.8",
     "concurrently": "^10.0.4",
-    "lint-staged": "^15.2.7",
     "prettier": "^3.3.3",
     "typescript": "^5.5.3"
   },
   "workspaces": [
     "packages/server",
     "packages/client"
-  ],
-  "dependencies": {
-    "dotenv": "^17.2.1"
-  }
+  ]
 }
