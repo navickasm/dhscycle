@@ -3,6 +3,7 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {LunchBlock, Period, TimeBlock} from '../../schedule.ts';
 import {adminFetch} from './adminApi.ts';
+import SpecialWizard, {WizardResult} from './SpecialWizard.tsx';
 
 type ScheduleBlock = TimeBlock | LunchBlock;
 
@@ -19,6 +20,7 @@ interface DayRow {
     schedule_json: string | null;
     ref_code: number | null;
     calendar_events: string | null;
+    truly_special?: number;
 }
 
 interface ScheduleEditorPopupProps {
@@ -280,6 +282,8 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
     const [calendarEvents, setCalendarEvents] = useState('');
     const [existsInDb, setExistsInDb] = useState(false);
     const [promotedFrom, setPromotedFrom] = useState<Regularity | null>(null);
+    const [trulySpecial, setTrulySpecial] = useState(false);
+    const [showWizard, setShowWizard] = useState(false);
 
     const [dragIndex, setDragIndex] = useState<number | null>(null);
     const [dirty, setDirty] = useState(false);
@@ -318,6 +322,7 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
 
                 setExistsInDb(true);
                 setCalendarEvents(row.calendar_events ?? '');
+                setTrulySpecial(!!row.truly_special);
 
                 if (row.regularity === 'no') {
                     setDayType('no');
@@ -361,18 +366,39 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
 
     const handleTypeSelect = (type: DayType) => {
         if (type === dayType) return;
+        if (type === 'special') {
+            setShowWizard(true);
+            return;
+        }
         setDayType(type);
         setDirty(true);
         setPromotedFrom(null);
         if ((REGULARITIES as readonly string[]).includes(type)) {
             setBlocks(regularSchedules[type] ?? []);
-        } else if (type === 'special') {
-            if (isRegular) {
-                setSpecialBase(dayType);
-            }
         } else if (type === 'no') {
             setBlocks([]);
         }
+    };
+
+    const handleWizardApply = (result: WizardResult) => {
+        setShowWizard(false);
+        setDayType('special');
+        setPromotedFrom(null);
+        setBlocks(result.blocks);
+        setSpecialName(result.name);
+        setSpecialH2(result.h2 ?? '');
+        setSpecialBase(result.base);
+        setDirty(true);
+    };
+
+    const handleWizardCustom = () => {
+        setShowWizard(false);
+        setPromotedFrom(null);
+        if (isRegular) {
+            setSpecialBase(dayType);
+        }
+        setDayType('special');
+        setDirty(true);
     };
 
     const handleBlockChange = (index: number, updated: ScheduleBlock) => {
@@ -473,6 +499,7 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
                     special_schedule_base: specialBase === 'none' ? null : specialBase,
                     schedule_json: JSON.stringify(blocks),
                     calendar_events: calendarEvents || null,
+                    truly_special: trulySpecial,
                 };
             } else {
                 body = {
@@ -505,8 +532,12 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
         }
     };
 
-    const handleClose = async () => {
-        if (dirty && !saving && !validationError) {
+    const handleClose = async (forceSave = false) => {
+        if (showWizard) {
+            setShowWizard(false);
+            return;
+        }
+        if ((dirty || forceSave) && !saving && !validationError) {
             const ok = await handleSave();
             if (!ok) return;
         }
@@ -517,11 +548,41 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') void handleCloseRef.current();
+            if (e.key === 'Escape') {
+                void handleCloseRef.current();
+            } else if (e.key === 'Enter') {
+                const tag = (e.target as HTMLElement | null)?.tagName;
+                if (tag === 'BUTTON' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+                e.preventDefault();
+                void handleCloseRef.current(true);
+            }
         };
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
     }, []);
+
+    const handleSaveTemplate = async () => {
+        const defaultName = specialName || 'New Template';
+        const name = window.prompt('Template name:', defaultName);
+        if (!name) return;
+        try {
+            const res = await adminFetch('/admin/templates', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name,
+                    base: specialBase === 'none' ? null : specialBase,
+                    schedule_json: JSON.stringify(blocks),
+                }),
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                throw new Error(data?.message ?? `HTTP error! status: ${res.status}`);
+            }
+        } catch (err) {
+            console.error('Error saving template:', err);
+            setError(err instanceof Error ? err.message : 'Failed to save template.');
+        }
+    };
 
     const handleDelete = async () => {
         if (!window.confirm(`Delete all schedule data for ${date}? This cannot be undone.`)) return;
@@ -693,6 +754,25 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
                                         {REGULARITIES.map(r => <option key={r} value={r}>{r}</option>)}
                                     </select>
                                 </label>
+                                <label style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.4rem',
+                                    fontSize: '0.85rem',
+                                    color: '#444',
+                                    flex: '1 1 100%',
+                                    cursor: 'pointer',
+                                }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={trulySpecial}
+                                        onChange={e => {
+                                            setTrulySpecial(e.target.checked);
+                                            setDirty(true);
+                                        }}
+                                    />
+                                    Reusable special (assembly, pep rally, …) — surfaces this schedule in the wizard
+                                </label>
                             </div>
                         )}
 
@@ -797,23 +877,44 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
                             gap: '0.75rem',
                             marginTop: '0.25rem',
                         }}>
-                            <button
-                                onClick={handleDelete}
-                                disabled={saving || !existsInDb}
-                                title={existsInDb ? 'Delete this day from the database' : 'This day is not in the database'}
-                                style={{
-                                    padding: '0.4rem 1rem',
-                                    font: 'inherit',
-                                    cursor: existsInDb ? 'pointer' : 'not-allowed',
-                                    color: '#cc0000',
-                                    border: '1px solid #cc0000',
-                                    borderRadius: '6px',
-                                    background: 'none',
-                                    opacity: existsInDb ? 1 : 0.5,
-                                }}
-                            >
-                                Delete Day
-                            </button>
+                            <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                                <button
+                                    onClick={handleDelete}
+                                    disabled={saving || !existsInDb}
+                                    title={existsInDb ? 'Delete this day from the database' : 'This day is not in the database'}
+                                    style={{
+                                        padding: '0.4rem 1rem',
+                                        font: 'inherit',
+                                        cursor: existsInDb ? 'pointer' : 'not-allowed',
+                                        color: '#cc0000',
+                                        border: '1px solid #cc0000',
+                                        borderRadius: '6px',
+                                        background: 'none',
+                                        opacity: existsInDb ? 1 : 0.5,
+                                    }}
+                                >
+                                    Delete Day
+                                </button>
+                                {dayType === 'special' && (
+                                    <button
+                                        onClick={handleSaveTemplate}
+                                        disabled={saving || blocks.length === 0}
+                                        title="Save this schedule as a reusable template"
+                                        style={{
+                                            padding: '0.4rem 1rem',
+                                            font: 'inherit',
+                                            cursor: blocks.length === 0 ? 'not-allowed' : 'pointer',
+                                            color: '#1155cc',
+                                            border: '1px solid #1155cc',
+                                            borderRadius: '6px',
+                                            background: 'none',
+                                            opacity: blocks.length === 0 ? 0.5 : 1,
+                                        }}
+                                    >
+                                        Save as template
+                                    </button>
+                                )}
+                            </div>
 
                             <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem'}}>
                                 {dirty && <span style={{color: '#996600', fontSize: '0.85rem'}}>Unsaved changes</span>}
@@ -845,6 +946,16 @@ export default function ScheduleEditorPopup({date, onClose, onSaved}: ScheduleEd
                     </div>
                 )}
             </div>
+
+            {showWizard && (
+                <SpecialWizard
+                    defaultBase={dayType}
+                    regularSchedules={regularSchedules}
+                    onApply={handleWizardApply}
+                    onCustom={handleWizardCustom}
+                    onCancel={() => setShowWizard(false)}
+                />
+            )}
         </div>
     );
 }

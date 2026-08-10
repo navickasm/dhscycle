@@ -9,6 +9,7 @@ export interface ScheduleDayRow {
     schedule_json: string | null;
     ref_code: number | null;
     calendar_events: string | null;
+    truly_special: number;
 }
 
 export interface DayUpsertInput {
@@ -19,12 +20,13 @@ export interface DayUpsertInput {
     schedule_json?: string | null;
     ref_code?: number | null;
     calendar_events?: string | null;
+    truly_special?: boolean | number;
 }
 
 export function getDay(date: string): ScheduleDayRow | null {
     const row = getDb().prepare<[string], ScheduleDayRow>(
         `SELECT date, regularity, special_schedule_name, special_schedule_h2,
-                special_schedule_base, schedule_json, ref_code, calendar_events
+                special_schedule_base, schedule_json, ref_code, calendar_events, truly_special
          FROM schedules WHERE date = ?;`
     ).get(date);
     return row ?? null;
@@ -33,7 +35,7 @@ export function getDay(date: string): ScheduleDayRow | null {
 export function getRange(startDate: string, endDate: string): ScheduleDayRow[] {
     return getDb().prepare<[string, string], ScheduleDayRow>(
         `SELECT date, regularity, special_schedule_name, special_schedule_h2,
-                special_schedule_base, schedule_json, ref_code, calendar_events
+                special_schedule_base, schedule_json, ref_code, calendar_events, truly_special
          FROM schedules WHERE date BETWEEN ? AND ? ORDER BY date;`
     ).all(startDate, endDate);
 }
@@ -41,9 +43,9 @@ export function getRange(startDate: string, endDate: string): ScheduleDayRow[] {
 export function upsertDay(date: string, input: DayUpsertInput): ScheduleDayRow {
     getDb().prepare(
         `INSERT INTO schedules (date, regularity, special_schedule_name, special_schedule_h2,
-                                special_schedule_base, schedule_json, ref_code, calendar_events)
+                                special_schedule_base, schedule_json, ref_code, calendar_events, truly_special)
          VALUES (@date, @regularity, @special_schedule_name, @special_schedule_h2,
-                 @special_schedule_base, @schedule_json, @ref_code, @calendar_events)
+                 @special_schedule_base, @schedule_json, @ref_code, @calendar_events, @truly_special)
          ON CONFLICT(date) DO UPDATE SET
              regularity = excluded.regularity,
              special_schedule_name = excluded.special_schedule_name,
@@ -51,7 +53,8 @@ export function upsertDay(date: string, input: DayUpsertInput): ScheduleDayRow {
              special_schedule_base = excluded.special_schedule_base,
              schedule_json = excluded.schedule_json,
              ref_code = excluded.ref_code,
-             calendar_events = excluded.calendar_events;`
+             calendar_events = excluded.calendar_events,
+             truly_special = excluded.truly_special;`
     ).run({
         date,
         regularity: input.regularity,
@@ -61,8 +64,29 @@ export function upsertDay(date: string, input: DayUpsertInput): ScheduleDayRow {
         schedule_json: input.schedule_json ?? null,
         ref_code: input.ref_code ?? null,
         calendar_events: input.calendar_events ?? null,
+        truly_special: input.truly_special ? 1 : 0,
     });
     return getDay(date)!;
+}
+
+export interface SpecialDaySummary {
+    date: string;
+    special_schedule_name: string | null;
+    special_schedule_h2: string | null;
+    special_schedule_base: string | null;
+    schedule_json: string | null;
+    truly_special: number;
+}
+
+export function listSpecialDays(): SpecialDaySummary[] {
+    return getDb().prepare<[], SpecialDaySummary>(
+        `SELECT MAX(date) AS date, special_schedule_name, special_schedule_h2,
+                special_schedule_base, schedule_json, MAX(truly_special) AS truly_special
+         FROM schedules
+         WHERE regularity = 'special'
+         GROUP BY special_schedule_name, schedule_json
+         ORDER BY truly_special DESC, date DESC;`
+    ).all();
 }
 
 export function deleteDay(date: string): boolean {

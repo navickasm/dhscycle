@@ -1,0 +1,1 @@
+ALTER TABLE schedules ADD COLUMN truly_special INTEGER NOT NULL DEFAULT 0;

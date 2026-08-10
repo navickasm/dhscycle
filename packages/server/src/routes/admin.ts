@@ -116,6 +116,15 @@ router.delete('/admin/day/:date', (req, res) => {
     }
 });
 
+router.get('/admin/specialDays', (req, res) => {
+    try {
+        res.status(200).json(adminService.listSpecialDays());
+    } catch (error) {
+        console.error('Error listing special days:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 router.get('/admin/settings', (req, res) => {
     try {
         res.status(200).json(adminService.getSettings());
