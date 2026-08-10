@@ -10,6 +10,7 @@ import ThisWeek, {ThisWeekSchedule} from "../components/thisweek/ThisWeek.tsx";
 import NotifBox from "../components/NotifBox.tsx";
 import Calendar, {YearMonth} from "../components/calendar/Calendar.tsx";
 import {CalendarCellData} from "../components/calendar/CalendarCell.tsx";
+import MessageBox from "../components/MessageBox.tsx";
 
 const API_BASE = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com';
 
@@ -201,6 +202,7 @@ function HomeContent() {
                     isToday={isViewingToday}
                     onBackToToday={() => handleSelectDate(todayStr)}
                 ></Heading>
+                <MessageBox apiBase={API_BASE}/>
                 <div style={{
                     display: "flex",
                     gap: "20px",

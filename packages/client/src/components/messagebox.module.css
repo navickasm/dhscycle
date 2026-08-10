@@ -1,0 +1,85 @@
+.box {
+    max-width: 700px;
+    width: 100%;
+    margin: 0 auto 20px;
+    padding: 16px 24px;
+    border: 1px solid #e0e0e0;
+    background-color: #fdfdfd;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    overflow-x: auto;
+    line-height: 1.55;
+}
+
+.box h1 {
+    font-size: 1.4rem;
+    margin: 0 0 8px;
+    color: #1a1a2e;
+}
+
+.box h2 {
+    font-size: 1.15rem;
+    margin: 18px 0 8px;
+    color: var(--main);
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 4px;
+}
+
+.box h3 {
+    font-size: 1rem;
+    margin: 14px 0 6px;
+}
+
+.box p {
+    margin: 8px 0;
+}
+
+.box ul, .box ol {
+    margin: 8px 0;
+    padding-left: 22px;
+}
+
+.box li {
+    margin: 3px 0;
+}
+
+.box table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10px 0;
+    font-size: 0.92rem;
+}
+
+.box th, .box td {
+    border: 1px solid #ddd;
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.box th {
+    background-color: var(--main);
+    color: #fff;
+    font-weight: 600;
+}
+
+.box tr:nth-child(even) td {
+    background-color: var(--light);
+}
+
+.box a {
+    color: var(--main);
+}
+
+.box hr {
+    border: none;
+    border-top: 1px solid #eaeaea;
+    margin: 14px 0;
+}
+
+.box blockquote {
+    margin: 10px 0;
+    padding: 6px 14px;
+    border-left: 3px solid #ccc;
+    background: #f7f7f7;
+    color: #555;
+}
