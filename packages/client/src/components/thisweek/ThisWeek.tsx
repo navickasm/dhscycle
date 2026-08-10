@@ -42,6 +42,7 @@ export default function ThisWeek(p: ThisWeekProps) {
                             title={clickable ? (isToday ? "Today" : "Click to view this day's schedule") : undefined}
                             style={{
                                 cursor: clickable ? "pointer" : undefined,
+                                position: "relative",
                                 outline: isToday
                                     ? "3px solid var(--main)"
                                     : isSelected

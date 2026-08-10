@@ -8,8 +8,8 @@ import {Schedule} from "../schedule.ts";
 import Table from "../components/schedule/Table.tsx";
 import ThisWeek, {ThisWeekSchedule} from "../components/thisweek/ThisWeek.tsx";
 import NotifBox from "../components/NotifBox.tsx";
-import Calendar from "../components/calendar/Calendar.tsx";
-import {CalendarCellProps} from "../components/calendar/CalendarCell.tsx";
+import Calendar, {YearMonth} from "../components/calendar/Calendar.tsx";
+import {CalendarCellData} from "../components/calendar/CalendarCell.tsx";
 
 const API_BASE = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : 'https://api.dhscycle.com';
 
@@ -17,6 +17,14 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 function toDateStr(d: Date): string {
     return d.toISOString().split('T')[0];
+}
+
+function schoolYearMonths(today: Date): YearMonth[] {
+    const startYear = today.getMonth() + 1 >= 7 ? today.getFullYear() : today.getFullYear() - 1;
+    const months: YearMonth[] = [];
+    for (let m = 8; m <= 12; m++) months.push({year: startYear, month: m});
+    for (let m = 1; m <= 6; m++) months.push({year: startYear + 1, month: m});
+    return months;
 }
 
 function HomeContent() {
@@ -28,7 +36,7 @@ function HomeContent() {
 
     const [schedule, setSchedule] = useState<Schedule | null>(null);
     const [thisWeek, setThisWeek] = useState<ThisWeekSchedule[] | null>(null);
-    const [calendar, setCalendar] = useState<CalendarCellProps[]>([]);
+    const [calendar, setCalendar] = useState<CalendarCellData[]>([]);
 
     const [isVisible, setIsVisible] = useState(true);
 
@@ -49,6 +57,20 @@ function HomeContent() {
     const viewedDate = useMemo(() => new Date(`${viewedDateStr}T12:00:00`), [viewedDateStr]);
 
     const viewedMonth = parseInt(viewedDateStr.split('-')[1], 10);
+
+    const months = useMemo(() => schoolYearMonths(today), [today]);
+
+    const [calendarMonthIndex, setCalendarMonthIndex] = useState<number>(() => {
+        const idx = schoolYearMonths(new Date()).findIndex(ym => ym.month === viewedMonth);
+        return idx >= 0 ? idx : 0;
+    });
+
+    useEffect(() => {
+        const idx = months.findIndex(ym => ym.month === viewedMonth);
+        if (idx >= 0) setCalendarMonthIndex(idx);
+    }, [viewedMonth, months]);
+
+    const calendarMonth = months[calendarMonthIndex]?.month ?? viewedMonth;
 
     const weekDates = useMemo(() => {
         const base = new Date(`${viewedDateStr}T00:00:00Z`);
@@ -144,12 +166,12 @@ function HomeContent() {
     useEffect(() => {
         const fetchCalendar = async () => {
             try {
-                const calendarResponse = await fetch(`${API_BASE}/calendar/${viewedMonth}`);
+                const calendarResponse = await fetch(`${API_BASE}/calendar/${calendarMonth}`);
                 if (!calendarResponse.ok) {
                     throw new Error(`HTTP error! status: ${calendarResponse.status}`);
                 }
 
-                const calendarData: CalendarCellProps[] = (await calendarResponse.json()).map((item: any) => {
+                const calendarData: CalendarCellData[] = (await calendarResponse.json()).map((item: any) => {
                     return {
                         ...item,
                         date: new Date(Date.UTC(
@@ -167,7 +189,7 @@ function HomeContent() {
         };
 
         fetchCalendar();
-    }, [viewedMonth]);
+    }, [calendarMonth]);
 
     return (
         <div className={styles.page}>
@@ -197,12 +219,13 @@ function HomeContent() {
                 </div>
                 <div style={{overflowX: "auto", width: "100%"}}>
                     <Calendar
-                        cells={calendar.map(cell => ({
-                            ...cell,
-                            isToday: toDateStr(cell.date) === todayStr,
-                            isSelected: toDateStr(cell.date) === viewedDateStr,
-                        }))}
-                        onSelectDate={handleSelectDate}
+                        cells={calendar}
+                        todayDate={todayStr}
+                        selectedDate={viewedDateStr}
+                        onCellClick={(date) => handleSelectDate(toDateStr(date))}
+                        months={months}
+                        monthIndex={calendarMonthIndex}
+                        onMonthChange={setCalendarMonthIndex}
                     />
                 </div>
             </main>
