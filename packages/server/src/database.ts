@@ -19,6 +19,7 @@ export function initializeDatabase(): Database.Database {
 
     dbInstance.pragma('journal_mode = WAL');
     dbInstance.pragma('foreign_keys = ON');
+    dbInstance.pragma('busy_timeout = 5000');
 
     console.log('Connected to the SQLite database.');
     return dbInstance;
@@ -33,8 +34,35 @@ export function getDb(): Database.Database {
 
 export function closeDatabase(): void {
     if (dbInstance) {
+        let cp = false;
+        try {
+            dbInstance.pragma('wal_checkpoint(TRUNCATE)');
+            cp = true;
+        } catch (error) {
+            console.error('Error checkpointing WAL before close:', error);
+        }
+
         dbInstance.close();
         dbInstance = null;
-        console.log('Database connection closed.');
+
+        try {
+            const walPath = `${dbPath}-wal`;
+            const shmPath = `${dbPath}-shm`;
+
+            if (cp && fs.existsSync(walPath)) {
+                const walStats = fs.statSync(walPath);
+                if (walStats.size === 0) {
+                    fs.rmSync(walPath, { force: true });
+                    if (fs.existsSync(shmPath)) {
+                        fs.rmSync(shmPath, { force: true });
+                    }
+                    console.log('Database connection closed.');
+                } else {
+                    console.warn('WARNING: WAL file is not empty. Skipping deletion to prevent data loss.');
+                }
+            }
+        } catch (error) {
+            console.error('Error during residual file cleanup:', error);
+        }
     }
 }

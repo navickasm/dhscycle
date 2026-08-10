@@ -20,12 +20,10 @@ app.listen(4000, () => {
     console.log("API Server online");
 });
 
-process.on('SIGINT', () => {
+function handleShutdown(signal: string) {
     closeDatabase();
     process.exit(0);
-});
+}
 
-process.on('SIGTERM', () => {
-    closeDatabase();
-    process.exit(0);
-});
+process.on('SIGINT', () => handleShutdown('SIGINT'));
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));
