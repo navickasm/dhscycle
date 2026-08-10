@@ -221,12 +221,120 @@ function InvalidateCachesTool() {
     );
 }
 
+function DownloadDbTool() {
+    const [busy, setBusy] = useState(false);
+    const [status, setStatus] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const run = async () => {
+        setBusy(true);
+        setError(null);
+        setStatus(null);
+        try {
+            const res = await adminFetch('/admin/downloadDb');
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                throw new Error(data?.message ?? `HTTP error! status: ${res.status}`);
+            }
+            const blob = await res.blob();
+            const disposition = res.headers.get('Content-Disposition') ?? '';
+            const match = disposition.match(/filename="?([^";]+)"?/);
+            const filename = match?.[1] ?? 'schedule.db';
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Download DB error:', err);
+            setError(err instanceof Error ? err.message : 'Something went wrong.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    return (
+        <section style={sectionStyle}>
+            <h2 style={{margin: 0, fontSize: '1.1rem'}}>Download Database</h2>
+            <button onClick={() => void run()} disabled={busy} style={{...buttonStyle, opacity: busy ? 0.6 : 1}}>
+                {busy ? 'Preparing…' : 'Download DB'}
+            </button>
+            {error && <p style={{margin: 0, fontSize: '0.85rem', color: 'red'}}>{error}</p>}
+        </section>
+    );
+}
+
+function UploadDbTool() {
+    const [file, setFile] = useState<File | null>(null);
+    const [busy, setBusy] = useState(false);
+    const [status, setStatus] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+    const run = async () => {
+        if (!file) return;
+        if (!window.confirm(`Replace the server database with "${file.name}"? This cannot be undone.`)) return;
+        setBusy(true);
+        setError(null);
+        setStatus(null);
+        try {
+            const res = await adminFetch('/admin/uploadDb', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/octet-stream'},
+                body: await file.arrayBuffer(),
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                throw new Error(data?.message ?? `HTTP error! status: ${res.status}`);
+            }
+            setStatus('Database replaced');
+            setFile(null);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        } catch (err) {
+            console.error('Upload DB error:', err);
+            setError(err instanceof Error ? err.message : 'Something went wrong.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    return (
+        <section style={sectionStyle}>
+            <h2 style={{margin: 0, fontSize: '1.1rem'}}>Upload Database</h2>
+            <label style={labelStyle}>
+                Database file (.db)
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".db,.sqlite,.sqlite3"
+                    onChange={e => setFile(e.target.files?.[0] ?? null)}
+                    style={inputStyle}
+                />
+            </label>
+            <button
+                onClick={() => void run()}
+                disabled={busy || !file}
+                style={{...buttonStyle, backgroundColor: '#b3261e', opacity: busy || !file ? 0.6 : 1}}
+            >
+                {busy ? 'Uploading…' : 'Upload DB'}
+            </button>
+            {status && <p style={{margin: 0, fontSize: '0.85rem', color: '#1a7a1a'}}>{status}</p>}
+            {error && <p style={{margin: 0, fontSize: '0.85rem', color: 'red'}}>{error}</p>}
+        </section>
+    );
+}
+
 export default function AdminToolsPage() {
     return (
         <div style={{display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '720px'}}>
             <h1 style={{margin: 0}}>Tools</h1>
             <BreakWizard/>
             <PopulateTool/>
+            <DownloadDbTool/>
+            <UploadDbTool/>
             <InvalidateCachesTool/>
         </div>
     );

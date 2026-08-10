@@ -2,11 +2,16 @@ import { Router } from 'express';
 import Express from 'express';
 import dotenv from 'dotenv';
 import {DateTime} from 'luxon';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import {populateDb} from '../services/populateService.js';
 import {invalidateCaches} from "../services/cacheService.js";
 import {adminAuth} from "../middleware/adminAuth.js";
 import {isValidISODate} from "../utils.js";
 import * as adminService from "../services/adminService.js";
+import {getDb, replaceDatabaseFile} from "../database.js";
+import Database from 'better-sqlite3';
 
 const router = Router();
 
@@ -47,6 +52,63 @@ router.post('/admin/populate', (req, res) => {
 router.post('/admin/invalidateCache', (req, res) => {
     invalidateCaches();
     res.status(200).json({ message: 'Caches invalidated successfully.' });
+});
+
+router.get('/admin/downloadDb', async (req, res) => {
+    const tmpPath = path.join(os.tmpdir(), `dhscycle-backup-${Date.now()}.db`);
+    try {
+        await getDb().backup(tmpPath);
+
+        const dateStr = DateTime.now().toISODate();
+        res.download(tmpPath, `schedule-${dateStr}.db`, (err) => {
+            fs.rm(tmpPath, { force: true }, () => {});
+            if (err && !res.headersSent) {
+                res.status(500).json({ message: 'Internal Server Error' });
+            }
+        });
+    } catch (error) {
+        console.error('Error backing up database:', error);
+        fs.rm(tmpPath, { force: true }, () => {});
+        if (!res.headersSent) {
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    }
+});
+
+router.post('/admin/uploadDb', Express.raw({ type: 'application/octet-stream', limit: '100mb' }), async (req, res) => {
+    if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+        return res.status(400).json({ message: 'Malformed Request: body must be a non-empty database file (application/octet-stream)' });
+    }
+
+    const tmpPath = path.join(os.tmpdir(), `dhscycle-upload-${Date.now()}.db`);
+    try {
+        fs.writeFileSync(tmpPath, req.body);
+
+        let checkDb: Database.Database | null = null;
+        try {
+            checkDb = new Database(tmpPath, { readonly: true, fileMustExist: true });
+            const result = checkDb.pragma('integrity_check', { simple: true });
+            if (result !== 'ok') {
+                return res.status(400).json({ message: `Uploaded file failed integrity check: ${result}` });
+            }
+        } catch (error) {
+            console.error('Error validating uploaded database:', error);
+            return res.status(400).json({ message: 'Uploaded file is not a valid SQLite database.' });
+        } finally {
+            checkDb?.close();
+        }
+
+        replaceDatabaseFile(tmpPath);
+        invalidateCaches();
+        res.status(200).json({ message: 'Database replaced successfully.' });
+    } catch (error) {
+        console.error('Error uploading database:', error);
+        if (!res.headersSent) {
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    } finally {
+        fs.rm(tmpPath, { force: true }, () => {});
+    }
 });
 
 router.get('/admin/range', (req, res) => {

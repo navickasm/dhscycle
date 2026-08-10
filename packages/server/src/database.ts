@@ -32,6 +32,26 @@ export function getDb(): Database.Database {
     return dbInstance;
 }
 
+export function replaceDatabaseFile(sourcePath: string): void {
+    const backupPath = `${dbPath}.replace-backup`;
+    closeDatabase();
+    fs.copyFileSync(dbPath, backupPath);
+    try {
+        fs.copyFileSync(sourcePath, dbPath);
+        fs.rmSync(`${dbPath}-wal`, { force: true });
+        fs.rmSync(`${dbPath}-shm`, { force: true });
+        initializeDatabase();
+        fs.rmSync(backupPath, { force: true });
+    } catch (error) {
+        fs.copyFileSync(backupPath, dbPath);
+        fs.rmSync(`${dbPath}-wal`, { force: true });
+        fs.rmSync(`${dbPath}-shm`, { force: true });
+        initializeDatabase();
+        fs.rmSync(backupPath, { force: true });
+        throw error;
+    }
+}
+
 export function closeDatabase(): void {
     if (dbInstance) {
         let cp = false;
