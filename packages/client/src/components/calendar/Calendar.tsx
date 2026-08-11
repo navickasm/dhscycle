@@ -27,6 +27,35 @@ function toDateStr(d: Date): string {
     return d.toISOString().split('T')[0];
 }
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function columnIndex(d: Date): number {
+    return (d.getUTCDay() + 6) % 7;
+}
+
+function buildWeekRows(cells: CalendarCellData[]): (CalendarCellData | null)[][] {
+    const sorted = [...cells].sort((a, b) => a.date.getTime() - b.date.getTime());
+    const weekdayCells = sorted.filter(c => columnIndex(c.date) <= 4);
+    if (weekdayCells.length === 0) return [];
+
+    const first = weekdayCells[0].date;
+    const gridStart = Date.UTC(first.getUTCFullYear(), first.getUTCMonth(), first.getUTCDate())
+        - columnIndex(first) * MS_PER_DAY;
+
+    const rows: (CalendarCellData | null)[][] = [];
+    for (const cell of weekdayCells) {
+        const dayOffset = Math.floor((Date.UTC(
+            cell.date.getUTCFullYear(),
+            cell.date.getUTCMonth(),
+            cell.date.getUTCDate(),
+        ) - gridStart) / MS_PER_DAY);
+        const rowIndex = Math.floor(dayOffset / 7);
+        while (rows.length <= rowIndex) rows.push([null, null, null, null, null]);
+        rows[rowIndex][columnIndex(cell.date)] = cell;
+    }
+    return rows;
+}
+
 function ymLabel(ym: YearMonth, showYear?: boolean): string {
     return new Date(Date.UTC(ym.year, ym.month - 1, 1)).toLocaleString('en-US', {
         month: 'long',
@@ -143,7 +172,7 @@ export default function Calendar(p: CalendarProps) {
         return <p><b>Error:</b> No calendar data available.</p>;
     }
 
-    const paddingNeeded = p.cells.length > 0 ? p.cells[0].date.getUTCDay() - 1 : 0;
+    const weekRows = buildWeekRows(p.cells);
 
     const header = hasNav ? (
         <div className={styles.monthNav}>
@@ -193,31 +222,24 @@ export default function Calendar(p: CalendarProps) {
                 <th className={styles.tableLabel}>F</th>
             </tr>
 
-            {p.cells.length === 0 ? (
+            {weekRows.length === 0 ? (
                 <tr>
                     <td colSpan={5} style={{textAlign: 'center', padding: '2rem', color: '#888888'}}>
                         No calendar data available for this month.
                     </td>
                 </tr>
-            ) : Array.from({length: Math.ceil((paddingNeeded + p.cells.length) / 5)}).map((_, rowIndex) => (
+            ) : weekRows.map((row, rowIndex) => (
                 <tr key={`row-${rowIndex}`}>
-                    {Array.from({length: 5}).map((_, colIndex) => {
-                        const cellIndex = rowIndex * 5 + colIndex;
-                        if (cellIndex < paddingNeeded) {
-                            return <td key={`padding-${cellIndex}`}/>;
-                        }
-                        const cell = p.cells[cellIndex - paddingNeeded];
-                        return cell ? (
-                            <CalendarCell
-                                key={cellIndex}
-                                {...cell}
-                                onClick={p.onCellClick}
-                                isAdmin={p.isAdmin}
-                                isToday={!!p.todayDate && toDateStr(cell.date) === p.todayDate}
-                                isSelected={!!p.selectedDate && toDateStr(cell.date) === p.selectedDate}
-                            />
-                        ) : <td key={`empty-${cellIndex}`}/>;
-                    })}
+                    {row.map((cell, colIndex) => cell ? (
+                        <CalendarCell
+                            key={toDateStr(cell.date)}
+                            {...cell}
+                            onClick={p.onCellClick}
+                            isAdmin={p.isAdmin}
+                            isToday={!!p.todayDate && toDateStr(cell.date) === p.todayDate}
+                            isSelected={!!p.selectedDate && toDateStr(cell.date) === p.selectedDate}
+                        />
+                    ) : <td key={`empty-${rowIndex}-${colIndex}`}/>)}
                 </tr>
             ))}
             </tbody>
