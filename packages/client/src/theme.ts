@@ -94,3 +94,56 @@ export function decodeTheme(code: string): Theme | null {
     }
     return theme;
 }
+
+const HOLIDAY_THEMES: Record<string, Theme> = {
+    halloween: {
+        '--main': '#f28c28',
+        '--light': '#4a2e10',
+        '--bg': '#181818',
+        '--fg': '#ededed',
+        '--dhsCycleBorder': '#3c3c3c',
+    },
+    valentines: {
+        '--main': '#e0507a',
+        '--light': '#fbdde7',
+        '--bg': '#fff5f8',
+        '--fg': '#171717',
+        '--dhsCycleBorder': '#f3cfdc',
+    },
+    thanksgiving: {
+        '--main': '#c06722',
+        '--light': '#f2e0c9',
+        '--bg': '#fdf8f0',
+        '--fg': '#2b1d12',
+        '--dhsCycleBorder': '#e3d5bd',
+    },
+};
+
+function sameDay(a: Date, b: Date): boolean {
+    return a.getFullYear() === b.getFullYear()
+        && a.getMonth() === b.getMonth()
+        && a.getDate() === b.getDate();
+}
+
+// Oct 31, or the Friday before if it falls on a weekend
+function halloweenDisplayDate(year: number): Date {
+    const d = new Date(year, 9, 31);
+    if (d.getDay() === 6) d.setDate(30);
+    else if (d.getDay() === 0) d.setDate(29);
+    return d;
+}
+
+// Tuesday before Thanksgiving
+function thanksgivingDisplayDate(year: number): Date {
+    const firstDay = new Date(year, 10, 1).getDay();
+    const firstThursday = 1 + ((4 - firstDay + 7) % 7);
+    return new Date(year, 10, firstThursday + 21 - 2);
+}
+
+export function holidayTheme(today: Date = new Date()): Theme | null {
+    const year = today.getFullYear();
+    if (sameDay(today, halloweenDisplayDate(year))) return HOLIDAY_THEMES.halloween;
+    if (today.getMonth() === 1 && today.getDate() === 14) return HOLIDAY_THEMES.valentines; //2.14
+    if (sameDay(today, thanksgivingDisplayDate(year))) return HOLIDAY_THEMES.thanksgiving;
+    return null;
+}
