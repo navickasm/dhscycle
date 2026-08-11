@@ -1,28 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 interface HeadingProps {
-    date: Date;
+    date: string;
     h2: string | null;
     isToday?: boolean;
     onBackToToday?: () => void;
 }
 
 export default function Heading(p: HeadingProps) {
-    const [date, setDate] = useState("");
-
-    useEffect(() => {
-        const centralTime = p.date.toLocaleString("en-US", {
-            timeZone: "America/Chicago",
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-        });
-
-        setDate(centralTime);
-
-    }, [p.date]);
+    const date = p.date;
 
     const notToday = p.isToday === false;
 

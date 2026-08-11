@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { centralSecondsOfDay } from '../../centralTime.ts';
 
 interface TimerProps {
     start: string;
@@ -18,23 +19,23 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
     // TODO make this work for CT, make <title> state-aware for efficiency
     useEffect(() => {
         const updateProgress = () => {
-            const now = new Date();
+            const nowSecs = centralSecondsOfDay();
             const [startHours, startMinutes] = start.split(':').map(Number);
             const [endHours, endMinutes] = end.split(':').map(Number);
 
-            const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHours, startMinutes, 0);
-            const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endHours, endMinutes, 0);
+            const startSecs = startHours * 3600 + startMinutes * 60;
+            const endSecs = endHours * 3600 + endMinutes * 60;
 
-            const totalDuration = endTime.getTime() - startTime.getTime();
-            const elapsedDuration = now.getTime() - startTime.getTime();
+            const totalDuration = endSecs - startSecs;
+            const elapsedDuration = nowSecs - startSecs;
 
             const progressPercentage = Math.min(100, Math.max(0, (elapsedDuration / totalDuration) * 100));
 
-            const periodTime = Math.ceil(totalDuration / (1000 * 60))
+            const periodTime = Math.ceil(totalDuration / 60)
 
             if (progressPercentage >= 100 || progressPercentage <= 0) {
-                const minutesUntilStart = Math.ceil((startTime.getTime() - now.getTime()) / (1000 * 60));
-                if (now < startTime && minutesUntilStart <= 30) {
+                const minutesUntilStart = Math.ceil((startSecs - nowSecs) / 60);
+                if (nowSecs < startSecs && minutesUntilStart <= 30) {
                     setRemainingTime(`${periodTime} mins (${minutesUntilStart} mins until start)`);
                 } else {
                     setRemainingTime(`${periodTime} mins`);
@@ -42,7 +43,7 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
                 setBackground("var(--bg)");
             } else {
                 setBackground(`linear-gradient(to bottom, var(--main) ${progressPercentage}%, var(--light) ${progressPercentage}%)`);
-                setRemainingTime(`${periodTime} mins (${Math.ceil((endTime.getTime() - now.getTime()) / (1000 * 60))} mins left)`);
+                setRemainingTime(`${periodTime} mins (${Math.ceil((endSecs - nowSecs) / 60)} mins left)`);
             }
         };
         
