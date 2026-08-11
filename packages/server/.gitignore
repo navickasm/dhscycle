@@ -2,4 +2,4 @@
 *.db-wal
 *.db-shm
 
-res/public/message.md
+res/public/*
