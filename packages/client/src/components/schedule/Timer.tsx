@@ -40,17 +40,19 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
             }
         };
         
-        let intervalId = setInterval(updateProgress, 1000);
-        
-        const startTimer = () => {
-            updateProgress();
-            intervalId = setInterval(updateProgress, 1000); // Update every second
-        };
+        let intervalId: ReturnType<typeof setInterval> | null = null;
 
         const stopTimer = () => {
-            if (intervalId) {
+            if (intervalId !== null) {
                 clearInterval(intervalId);
+                intervalId = null;
             }
+        };
+
+        const startTimer = () => {
+            stopTimer(); // never allow two concurrent intervals
+            updateProgress();
+            intervalId = setInterval(updateProgress, 1000); // Update every second
         };
 
         const handleVisibilityChange = () => {
