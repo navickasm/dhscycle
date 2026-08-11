@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface TimerProps {
     start: string;
@@ -8,6 +8,12 @@ interface TimerProps {
 const Timer: React.FC<TimerProps> = ({ start, end }) => {
     const [background, setBackground] = useState<string>('rgb(255, 255, 255)');
     const [remainingTime, setRemainingTime] = useState<string>("");
+    const overlayRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const td = overlayRef.current?.closest('td');
+        if (td) td.title = remainingTime;
+    }, [remainingTime]);
 
     // TODO make this work for CT, make <title> state-aware for efficiency
     useEffect(() => {
@@ -76,6 +82,7 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
 
     return (
         <div
+            ref={overlayRef}
             style={{
                 position: 'absolute',
                 top: 0,
@@ -85,7 +92,7 @@ const Timer: React.FC<TimerProps> = ({ start, end }) => {
                 background: background,
                 zIndex: 0,
                 transition: 'background 0.5s ease-out',
-            }} title={ remainingTime }
+            }}
         />
     );
 };

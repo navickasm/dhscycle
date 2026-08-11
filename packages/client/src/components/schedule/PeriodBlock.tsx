@@ -17,6 +17,13 @@ export function to12Hr(time24: string): string {
     return `${hours % 12 || 12}:${minutes.toString().padStart(2, "0")}`;
 }
 
+export function durationTitle(start: string, end: string): string {
+    const [startHours, startMinutes] = start.split(":").map(Number);
+    const [endHours, endMinutes] = end.split(":").map(Number);
+    const mins = (endHours * 60 + endMinutes) - (startHours * 60 + startMinutes);
+    return `${mins} mins`;
+}
+
 export function preferredPeriodName(period: string): JSX.Element {
     if (period === "SC") {
         return <span className={styles.pn} style={{ fontSize: "14pt", lineHeight: "1.0", display: "inline-block" }}>Staff Collab</span>;
@@ -33,7 +40,8 @@ export function PeriodBlockContent(p: PeriodBlockProps): JSX.Element {
     return (
         <td colSpan={p.type === "vertical" ? 1 : p.type === "big" ? 2 : p.type === "horiz" ? 2 : 3}
             rowSpan={p.type === "vertical" ? 2 : p.type === "big" ? 2 : p.type === "horiz" ? 1 : 1}
-            height={p.type == "vertical" ? 120 : p.type === "big" ? 120 : undefined}>
+            height={p.type == "vertical" ? 120 : p.type === "big" ? 120 : undefined}
+            title={p.showTimer === false ? durationTitle(p.period.start, p.period.end) : undefined}>
             <div style={{
                 display: "flex",
                 flexDirection: p.type === "vertical" ? "column" : "row",

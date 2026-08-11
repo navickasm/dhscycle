@@ -1,6 +1,6 @@
 // src/components/schedule/LunchBlock.tsx
 import styles from "../schedule.module.css";
-import {PeriodBlockContent, preferredPeriodName, to12Hr} from "./PeriodBlock.tsx";
+import {durationTitle, PeriodBlockContent, preferredPeriodName, to12Hr} from "./PeriodBlock.tsx";
 import type { LunchBlock } from "../../schedule.ts";
 import {JSX} from "react";
 import Timer from "./Timer.tsx";
@@ -12,7 +12,7 @@ interface LunchBlockProps {
 
 function Lunch({ period, showTimer }: { period: any; showTimer?: boolean }) {
     return (
-        <td className={styles.lunch}>
+        <td className={styles.lunch} title={showTimer === false ? durationTitle(period.start, period.end) : undefined}>
             <div style={{
                 display: "flex",
                 flexDirection: "column",
