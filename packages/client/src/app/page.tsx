@@ -195,7 +195,7 @@ function HomeContent() {
     return (
         <div className={styles.page}>
             <main className={styles.main}>
-                {/*{isVisible && <NotifBox title={"Welcome back!"} message={"This site, DHS Cycle, was rewritten over the summer to better support students with the new bell schedule. As such, some features (like the color editor) may be temporarily disabled. They will return soon alongside more advanced features!"} onClose={handleCloseNotif}/>}*/}
+                {isVisible && <NotifBox title={"New functionality"} message={"You can now select dates on the calendar or the \"This Week's Schedule\" table to view schedules in the future."} onClose={handleCloseNotif}/>}
                 <Heading
                     date={viewedDate}
                     h2={h2}
