@@ -37,7 +37,8 @@ function HomeContent() {
 
     const [schedule, setSchedule] = useState<Schedule | null>(null);
     const [thisWeek, setThisWeek] = useState<ThisWeekSchedule[] | null>(null);
-    const [calendar, setCalendar] = useState<CalendarCellData[]>([]);
+    const [calendar, setCalendar] = useState<CalendarCellData[] | null>(null);
+    const [serverError, setServerError] = useState<string | null>(null);
 
     const [isVisible, setIsVisible] = useState(true);
 
@@ -136,8 +137,14 @@ function HomeContent() {
                     setH2(scheduleData.h2 ?? null);
                     setSchedule(scheduleData);
                 }
+                setServerError(null);
             } catch (error) {
                 console.error("Error fetching schedule:", error);
+                setServerError(
+                    error instanceof TypeError
+                        ? "Can't reach the DHS Cycle server. It may be down, or you may be offline."
+                        : "The DHS Cycle server returned an error while loading the schedule."
+                );
             }
         };
 
@@ -202,6 +209,7 @@ function HomeContent() {
                     isToday={isViewingToday}
                     onBackToToday={() => handleSelectDate(todayStr)}
                 ></Heading>
+                {serverError && <NotifBox title={"Schedule Unavailable"} message={serverError}/>}
                 <MessageBox apiBase={API_BASE}/>
                 <div style={{
                     display: "flex",
@@ -211,15 +219,15 @@ function HomeContent() {
                     flexWrap: "wrap"
                 }}>
                     {schedule && !schedule.noSchool && <Table schedule={schedule} showTimer={isViewingToday} />}
-                    <ThisWeek
-                        schedule={thisWeek || []}
+                    {!serverError && thisWeek && <ThisWeek
+                        schedule={thisWeek}
                         weekDates={weekDates}
                         todayDate={todayStr}
                         selectedDate={viewedDateStr}
                         onSelectDate={handleSelectDate}
-                    />
+                    />}
                 </div>
-                <div style={{overflowX: "auto", width: "100%"}}>
+                {!serverError && calendar && <div style={{overflowX: "auto", width: "100%"}}>
                     <Calendar
                         cells={calendar}
                         todayDate={todayStr}
@@ -229,7 +237,7 @@ function HomeContent() {
                         monthIndex={calendarMonthIndex}
                         onMonthChange={setCalendarMonthIndex}
                     />
-                </div>
+                </div>}
             </main>
             <footer style={{textAlign: "center", padding: "10px", marginTop: "20px", backgroundColor: "var(--dhsCycleBorder)" }}>
                 <p>&copy; {new Date().getFullYear()} Mack Navickas/<a href={"https://greatlakes.software"} style={{color: "#29abe2"}}>GLS</a> | <a href={"https://github.com/navickasm/dhscycle/issues"}>Issue Tracker</a> | <a href={"/colorEditor"}>Color Editor</a> | <a href={"/privacy"}>Privacy</a></p>
