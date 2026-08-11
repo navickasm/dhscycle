@@ -33,8 +33,7 @@ function fetchCalendarForMonthFromDb(month: number): CalendarCells[] {
         const startDate = DateTime.fromObject({ year, month }).startOf('month').toISODate();
         const endDate = DateTime.fromObject({ year, month })
             .endOf('month')
-            .set({ weekday: 5 }) // Set to Friday
-            .plus({ days: DateTime.fromObject({ year, month }).endOf('month').weekday > 5 ? 7 : 0 }) // Adjust to next Friday if needed
+            .set({ weekday: 5 })
             .toISODate();
 
         const rows = getDb().prepare<[string, string], CalendarRow>(`
