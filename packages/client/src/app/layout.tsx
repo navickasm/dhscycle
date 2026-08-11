@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Script from "next/script"; // Import the Script component
 import { Roboto_Slab, Roboto_Condensed } from "next/font/google";
+import ThemeApplier from "../components/ThemeApplier.tsx";
 
 const robotoSlab = Roboto_Slab({
     subsets: ["latin"],
@@ -43,6 +44,7 @@ export default function RootLayout({ children, }: Readonly<{ children: React.Rea
             </Script>
         </head>
         <body>
+        <ThemeApplier/>
         {children}
         </body>
         </html>
