@@ -2,7 +2,7 @@ import {Router} from 'express';
 import {getCentralTimeDateString, isValidISODate} from '../utils.js';
 import {getBellScheduleForDate} from '../services/scheduleService.js';
 import {getWeekNames} from '../services/weekService.js';
-import {incrementCounter} from '../services/analyticsService.js';
+import {incrementFutureRequestCount, incrementTodayRequestCount} from '../services/analyticsService.js';
 
 const router = Router();
 
@@ -23,7 +23,11 @@ router.get('/schedule/:date', async (req, res) => {
             return res.status(400).json({ message: 'Date parameter is required in the URL (e.g., /schedule/YYYY-MM-DD).' });
         }
 
-        await incrementCounter();
+        if (req.params.date === getCentralTimeDateString(new Date())) {
+            incrementTodayRequestCount();
+        } else {
+            incrementFutureRequestCount();
+        }
 
         const schedule = await getBellScheduleForDate(req.params.date);
         return res.json(schedule);
