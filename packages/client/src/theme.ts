@@ -117,6 +117,13 @@ const HOLIDAY_THEMES: Record<string, Theme> = {
         '--fg': '#2b1d12',
         '--dhsCycleBorder': '#e3d5bd',
     },
+    stpatricks: {
+        '--main': '#028a0f',
+        '--light': '#81bb88',
+        '--bg': '#f5fff6',
+        '--fg': '#171717',
+        '--dhsCycleBorder': '#deecd9',
+    }
 };
 
 function sameDay(a: Date, b: Date): boolean {
@@ -144,6 +151,7 @@ export function holidayTheme(today: Date = new Date()): Theme | null {
     const year = today.getFullYear();
     if (sameDay(today, halloweenDisplayDate(year))) return HOLIDAY_THEMES.halloween;
     if (today.getMonth() === 1 && today.getDate() === 14) return HOLIDAY_THEMES.valentines; //2.14
+    if (sameDay(today, new Date(year, 2, 17))) return HOLIDAY_THEMES.stpatricks; //3.17
     if (sameDay(today, thanksgivingDisplayDate(year))) return HOLIDAY_THEMES.thanksgiving;
     return null;
 }
