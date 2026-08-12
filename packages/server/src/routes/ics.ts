@@ -29,6 +29,12 @@ function parseIcsOptions(query: Record<string, unknown>): IcsOptions | null {
         options.eb = eb === '1' || eb === 'true';
     }
 
+    if (query.sc !== undefined) {
+        const sc = String(query.sc).toLowerCase();
+        if (!['0', '1', 'true', 'false'].includes(sc)) return null;
+        options.sc = sc === '1' || sc === 'true';
+    }
+
     return options;
 }
 
@@ -36,7 +42,7 @@ router.get('/calendar.ics', (req, res) => {
     try {
         const options = parseIcsOptions(req.query as Record<string, unknown>);
         if (options === null) {
-            return res.status(400).json({ message: 'Malformed Request: lunch must be 1-3, friLunch must be A-C, fri6 must be A or B, eb must be 0/1' });
+            return res.status(400).json({ message: 'Malformed Request: lunch must be 1-3, friLunch must be A-C, fri6 must be A or B, eb and sc must be 0/1' });
         }
 
         const feed = getIcsFeed(options);
