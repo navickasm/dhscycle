@@ -16,6 +16,7 @@ export interface IcsOptions {
     friLunch?: 'A' | 'B' | 'C';
     fri6?: 'A' | 'B';
     eb?: boolean;
+    sc?: boolean;
 }
 
 interface IcsScheduleRow {
@@ -33,7 +34,7 @@ interface RegularScheduleRow {
 }
 
 export function icsVariantKey(options: IcsOptions): string {
-    return `l${options.lunch ?? 'x'}-f${options.friLunch ?? 'x'}${options.fri6 ?? ''}-e${options.eb === false ? '0' : '1'}`;
+    return `l${options.lunch ?? 'x'}-f${options.friLunch ?? 'x'}${options.fri6 ?? ''}-e${options.eb === false ? '0' : '1'}-s${options.sc === false ? '0' : '1'}`;
 }
 
 export function icsFeedUrl(options: IcsOptions): string {
@@ -42,6 +43,7 @@ export function icsFeedUrl(options: IcsOptions): string {
     if (options.friLunch !== undefined) params.set('friLunch', options.friLunch);
     if (options.fri6 !== undefined) params.set('fri6', options.fri6);
     if (options.eb !== undefined) params.set('eb', options.eb ? '1' : '0');
+    if (options.sc !== undefined) params.set('sc', options.sc ? '1' : '0');
     const query = params.toString();
     return `https://${API_HOST}${FEED_PATH}${query ? `?${query}` : ''}`;
 }
@@ -51,7 +53,9 @@ export function enumerateIcsVariants(): IcsOptions[] {
     for (const lunch of [1, 2, 3] as const) {
         for (const fri of [{friLunch: 'A', fri6: 'A'}, {friLunch: 'A', fri6: 'B'}, {friLunch: 'B'}, {friLunch: 'C'}] as const) {
             for (const eb of [true, false]) {
-                variants.push({lunch, ...fri, eb});
+                for (const sc of [true, false]) {
+                    variants.push({lunch, ...fri, eb, sc});
+                }
             }
         }
     }
@@ -189,6 +193,7 @@ function addEventsForDay(
             }
         } else if (entry?.period) {
             if (options.eb === false && entry.period === 'EB') continue;
+            if (options.sc === false && entry.period === 'SC') continue;
             addPeriodEvent(calendar, row.date, entry, description);
         }
     }
