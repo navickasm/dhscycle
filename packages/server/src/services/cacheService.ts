@@ -6,6 +6,7 @@ import {WeekDayName} from "../types/schedule.js";
 const scheduleCache = new Map<string, any>();
 const calendarCache = new Map<number, CalendarCells[]>();
 const weekCache = new Map<string, WeekDayName[]>();
+const icsCache = new Map<string, string>();
 
 let cacheDay: string | null = null;
 
@@ -21,6 +22,7 @@ function ensureFresh(): void {
         scheduleCache.clear();
         calendarCache.clear();
         weekCache.clear();
+        icsCache.clear();
         cacheDay = today;
     }
 }
@@ -55,11 +57,22 @@ export function setCachedWeek(weekStart: string, value: WeekDayName[]): void {
     weekCache.set(weekStart, value);
 }
 
+export function getCachedIcs(variant: string): string | undefined {
+    ensureFresh();
+    return icsCache.get(variant);
+}
+
+export function setCachedIcs(variant: string, value: string): void {
+    ensureFresh();
+    icsCache.set(variant, value);
+}
+
 export function invalidateCaches(): void {
     recomputeSchoolYear();
     scheduleCache.clear();
     calendarCache.clear();
     weekCache.clear();
+    icsCache.clear();
     cacheDay = getCentralTimeDateString(new Date());
 
     if (warm) {
