@@ -201,7 +201,7 @@ function HomeContent() {
     return (
         <div className={styles.page}>
             <main className={styles.main}>
-                {isVisible && <NotifBox title={"New functionality"} message={"You can now select dates on the calendar or the \"This Week's Schedule\" table to view schedules in the future."} onClose={handleCloseNotif}/>}
+                {/* isVisible && <NotifBox title={"New functionality"} message={"You can now select dates on the calendar or the \"This Week's Schedule\" table to view schedules in the future."} onClose={handleCloseNotif}/> */}
                 <Heading
                     date={viewedDate}
                     h2={h2}
