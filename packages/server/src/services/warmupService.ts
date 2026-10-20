@@ -13,9 +13,10 @@ export function warmCaches(): void {
         getBellScheduleForDate(todayStr);
         getWeekNames(todayStr);
         getCalendarForMonth(currentMonth);
-        for (const variant of enumerateIcsVariants()) {
-            getIcsFeed(variant);
-        }
+        // very very slow operation; don't cache until explicitly requested
+        // for (const variant of enumerateIcsVariants()) {
+        //     getIcsFeed(variant);
+        // }
         console.log(`Caches warmed for ${todayStr}`);
     } catch (error) {
         console.error('Error warming caches:', error);
