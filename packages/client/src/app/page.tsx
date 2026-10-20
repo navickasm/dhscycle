@@ -239,7 +239,11 @@ function HomeContent() {
                 </div>}
             </main>
             <footer style={{textAlign: "center", padding: "10px", marginTop: "20px", backgroundColor: "var(--dhsCycleBorder)" }}>
-                <p>&copy; {new Date().getFullYear()} Mack Navickas/<a href={"https://greatlakes.software"} style={{color: "#29abe2"}}>GLS</a> | <a href={"https://github.com/navickasm/dhscycle/issues"}>Issue Tracker</a> | <a href={"/colorEditor"}>Color Editor</a> | <a href={"/privacy"}>Privacy</a></p>
+                <p>&copy; {new Date().getFullYear()} Mack Navickas/<a href={"https://greatlakes.software"} style={{color: "#29abe2"}}>GLS</a>
+                &nbsp;| <a href={"https://github.com/navickasm/dhscycle/issues"}>Issue Tracker</a>
+                &nbsp;| <a href={"/colorEditor"}>Color Editor</a>
+                &nbsp;| <a href={"/icsGenerator"}>Calendar Integration</a>
+                &nbsp;| <a href={"/privacy"}>Privacy</a></p>
             </footer>
         </div>
     );
