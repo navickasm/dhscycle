@@ -10,7 +10,7 @@ const HR_LEN = 15;
 const EX_HR_LEN = 45;
 const EB_START = '07:14';
 
-export const EX_HR_LABEL = 'Ex HR';
+export const EX_HR_LABEL = 'HR';
 
 function toMin(t: string): number {
     const [h, m] = t.split(':').map(Number);
