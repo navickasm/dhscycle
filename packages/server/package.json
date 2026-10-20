@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --build --verbose",
-    "dev": "tsx watch src/index.ts",
+    "dev": "ADMIN_API_KEY=test tsx watch src/index.ts",
     "start": "node -r tsconfig-paths/register dist/index.js",
     "migrate": "tsx src/migrate.ts --module node16"
   },
