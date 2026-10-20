@@ -5,32 +5,27 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --build --verbose",
-    "dev": "nodemon --watch src --exec \"tsx src/index.ts\"",
+    "dev": "ADMIN_API_KEY=test tsx watch src/index.ts",
     "start": "node -r tsconfig-paths/register dist/index.js",
     "migrate": "tsx src/migrate.ts --module node16"
   },
   "type": "module",
   "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/luxon": "^3.6.2",
     "@types/node": "^22.15.30",
-    "@types/react": "^19.1.8",
-    "@types/validator": "^13.15.1",
-    "nodemon": "^3.1.10",
     "tsx": "^4.19.4"
   },
   "dependencies": {
+    "@touch4it/ical-timezones": "^1.9.0",
+    "better-sqlite3": "^13.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "express-rate-limit": "^8.0.1",
-    "graphql-config": "^5.1.5",
+    "ical-generator": "^11.1.0",
     "luxon": "^3.6.1",
-    "reflect-metadata": "^0.2.2",
-    "sequelize": "^6.37.7",
-    "sequelize-typescript": "^2.1.6",
-    "sqlite3": "^5.1.7",
     "tsconfig-paths": "^4.2.0"
   }
 }

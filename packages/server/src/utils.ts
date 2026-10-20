@@ -1,3 +1,9 @@
+import {DateTime} from 'luxon';
+
+export function isValidISODate(dateStr: unknown): dateStr is string {
+    return typeof dateStr === 'string' && DateTime.fromISO(dateStr).isValid;
+}
+
 export function getCentralTimeDateString(date: Date): string {
     const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',

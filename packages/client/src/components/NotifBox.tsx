@@ -13,7 +13,7 @@ export default function NotifBox(p: NotifBoxProps) {
             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
             position: "relative"
         }}>
-            <button
+            {p.onClose && <button
                 onClick={p.onClose}
                 style={{
                     position: "absolute",
@@ -28,7 +28,7 @@ export default function NotifBox(p: NotifBoxProps) {
                 aria-label={"Close"}
             >
                 ✖
-            </button>
+            </button>}
             <h2>{p.title}</h2>
             <p>{p.message}</p>
         </div>

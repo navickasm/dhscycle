@@ -1,12 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto+Slab:wght@100..900&display=swap');
-
 :root {
   --bg: #ffffff;
   --fg: #171717;
 
   --main: #e98888;
   --light: #f9e1e1;
-  --link-clicked: #eea5a5;
 
   --dhsCycleBorder: #e8e8e8;
 }
@@ -27,7 +24,7 @@ body {
 body {
   color: var(--fg);
   background: var(--bg);
-  font-family: 'Roboto Slab', serif;
+  font-family: var(--font-roboto-slab), 'Roboto Slab', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

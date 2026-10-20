@@ -6,22 +6,18 @@
   "scripts": {
     "pretty": "prettier --write packages/server",
     "build": "npm run build -w packages/server && npm run build -w packages/client",
-    "dev": "npm run dev -w packages/server & npm run dev -w packages/client",
+    "dev": "concurrently \"npm run dev -w packages/server\" \"npm run dev -w packages/client\"",
     "start": "npm run start -w packages/server",
     "migrate": "npm run migrate -w packages/server"
   },
   "type": "module",
   "devDependencies": {
-    "@types/react": "^19.1.8",
-    "lint-staged": "^15.2.7",
+    "concurrently": "^10.0.4",
     "prettier": "^3.3.3",
     "typescript": "^5.5.3"
   },
   "workspaces": [
     "packages/server",
     "packages/client"
-  ],
-  "dependencies": {
-    "dotenv": "^17.2.1"
-  }
+  ]
 }

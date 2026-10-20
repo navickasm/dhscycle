@@ -1,1 +1,5 @@
-res/schedule.db
+*.db
+*.db-wal
+*.db-shm
+
+res/public/*

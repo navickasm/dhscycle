@@ -1,57 +1,47 @@
 #!/usr/bin/env node
 
-import Express from 'express';
+import Express, {NextFunction, Request, Response} from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
 
-import scheduleRouter from './routes/schedule.js';
-import calendarRouter from './routes/calendar.js';
-import adminRouter from './routes/admin.js';
-import publicRouter from './routes/public.js';
+import routes from './routes/index.js';
+import {corsMiddleware} from './middleware/cors.js';
 import {closeDatabase, initializeDatabase} from "./database.js";
+import {setupCacheWarming} from "./services/warmupService.js";
 
 dotenv.config();
 
+initializeDatabase();
+setupCacheWarming();
+
 const app = Express();
 
-const allowedOrigins = [
-    'http://localhost:3000',
-    'https://www.dhscycle.com',
-    'http://www.dhscycle.com',
-    'https://dhscycle.com',
-    'http://dhscycle.com',
-];
+app.use(corsMiddleware);
+app.use(routes);
 
-app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-
-initializeDatabase().then(r => {
-    console.log("Database initialized successfully");
-})
-
-app.use(scheduleRouter);
-app.use(calendarRouter);
-app.use(adminRouter);
-app.use(publicRouter);
-
-// app.use((req, res) => {
-//     res.status(501).send();
-// });
-
-app.listen(4000);
-
-console.log("API Server online");
-
-process.on('SIGINT', async () => {
-    await closeDatabase();
-    process.exit(0);
+app.use((req: Request, res: Response) => {
+    res.status(404).json({ message: 'Not Found' });
 });
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    if (err.message === 'Not allowed by CORS') {
+        return res.status(403).json({ message: 'Forbidden: Origin not allowed' });
+    }
+
+    console.error('Unhandled error:', err);
+    if (res.headersSent) {
+        return next(err);
+    }
+    return res.status(500).json({ message: 'Internal Server Error' });
+});
+
+app.listen(4000, () => {
+    console.log("API Server online");
+});
+
+function handleShutdown(signal: string) {
+    closeDatabase();
+    process.exit(0);
+}
+
+process.on('SIGINT', () => handleShutdown('SIGINT'));
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));

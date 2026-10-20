@@ -7,6 +7,7 @@ import React from "react";
 
 interface TableProps {
     schedule: Schedule;
+    showTimer?: boolean;
 }
 
 export default function Table(p: TableProps) {
@@ -28,9 +29,9 @@ export default function Table(p: TableProps) {
                 <tbody>
                 {p.schedule.times.map((period, index) => {
                     if ('lunchBlock' in period && period.lunchBlock) {
-                        return <LunchBlock key={index} times={period}/>;
+                        return <LunchBlock key={index} times={period} showTimer={p.showTimer}/>;
                     } else if ('period' in period && 'start' in period && 'end' in period) {
-                        return <PeriodBlock key={index} period={period}/>;
+                        return <PeriodBlock key={index} period={period} showTimer={p.showTimer}/>;
                     }
                     return null;
                 })}
