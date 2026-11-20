@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import {getIcsFeed, IcsOptions} from '../services/icsService.js';
+import { incrementIcsRequestCount } from '../services/analyticsService.js';
 
 const router = Router();
 
@@ -44,6 +45,8 @@ router.get('/calendar.ics', (req, res) => {
         if (options === null) {
             return res.status(400).json({ message: 'Malformed Request: lunch must be 1-3, friLunch must be A-C, fri6 must be A or B, eb and sc must be 0/1' });
         }
+
+        res.on('finish', incrementIcsRequestCount);
 
         const feed = getIcsFeed(options);
         res.set({
