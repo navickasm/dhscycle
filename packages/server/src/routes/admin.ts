@@ -11,6 +11,7 @@ import {adminAuth} from "../middleware/adminAuth.js";
 import {isValidISODate} from "../utils.js";
 import * as adminService from "../services/adminService.js";
 import {getDb, replaceDatabaseFile} from "../database.js";
+import {ANALYTICS_TYPES, AnalyticsOptions, AnalyticsType, getAnalytics} from "../services/analyticsService.js";
 import Database from 'better-sqlite3';
 
 const router = Router();
@@ -274,5 +275,47 @@ router.put('/admin/regularSchedules/:regularity', (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
+router.get('/admin/analytics', (req, res) => {
+    const options = parseAnalyticsOptions(req.query as Record<string, unknown>);
+    if (options === null) {
+        return res.status(400).json({ message: 'Malformed Request: types must contain (\'today\', \'future\', or \'ics\'), startDate and endDate must be valid dates.' });
+    }
+    const analytics = getAnalytics(options);
+    res.status(200).json(analytics);
+});
+
+
+function parseAnalyticsOptions(query: Record<string, unknown>): AnalyticsOptions | null {
+    const options: AnalyticsOptions = {
+        types: [],
+        startDate: '',
+        endDate: ''
+    };
+
+    if (query.types == undefined || query.startDate == undefined || query.endDate == undefined) {
+        return null;
+    }
+
+    const types = String(query.namespaces).split(',').map(type => type.trim().toLowerCase());
+    const analyticsTypes: AnalyticsType[] = [];
+    for (const type of types) {
+        if (ANALYTICS_TYPES.includes(type as AnalyticsType)) {
+            analyticsTypes.push(type as AnalyticsType);
+        }
+    }
+    if (analyticsTypes.length === 0) {
+        return null;
+    }
+    options.types = analyticsTypes;
+
+    if (!isValidISODate(String(query.startDate)) || !isValidISODate(String(query.endDate))) {
+        return null;
+    }
+    options.startDate = String(query.startDate);
+    options.endDate = String(query.endDate);
+
+    return options;
+}
 
 export default router;
