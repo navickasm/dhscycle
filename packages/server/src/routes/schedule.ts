@@ -24,9 +24,9 @@ router.get('/schedule/:date', async (req, res) => {
         }
 
         if (req.params.date === getCentralTimeDateString(new Date())) {
-            incrementTodayRequestCount();
+            req.on('finish', incrementTodayRequestCount);
         } else {
-            incrementFutureRequestCount();
+            req.on('finish', incrementFutureRequestCount);
         }
 
         const schedule = await getBellScheduleForDate(req.params.date);
