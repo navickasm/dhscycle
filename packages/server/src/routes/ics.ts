@@ -7,34 +7,34 @@ const router = Router();
 function parseIcsOptions(query: Record<string, unknown>): IcsOptions | null {
     const options: IcsOptions = {};
 
-    if (query.lunch !== undefined) {
-        if (!['1', '2', '3'].includes(String(query.lunch))) return null;
-        options.lunch = parseInt(String(query.lunch), 10) as 1 | 2 | 3;
+    if (query.lunch == undefined ||
+        query.friLunch == undefined ||
+        query.fri6 == undefined ||
+        query.eb == undefined ||
+        query.sc == undefined) {
+        return null;
     }
 
-    if (query.friLunch !== undefined) {
-        const friLunch = String(query.friLunch).toUpperCase();
-        if (!['A', 'B', 'C'].includes(friLunch)) return null;
-        options.friLunch = friLunch as 'A' | 'B' | 'C';
+    if (!['1', '2', '3'].includes(String(query.lunch))) return null;
+    options.lunch = parseInt(String(query.lunch), 10) as 1 | 2 | 3;
+    
+    const friLunch = String(query.friLunch).toUpperCase();
+    if (!['A', 'B', 'C'].includes(friLunch)) return null;
+    options.friLunch = friLunch as 'A' | 'B' | 'C';
 
-        if (friLunch === 'A') {
-            const fri6 = String(query.fri6 ?? 'A').toUpperCase();
-            if (!['A', 'B'].includes(fri6)) return null;
-            options.fri6 = fri6 as 'A' | 'B';
-        }
+    if (friLunch === 'A') {
+        const fri6 = String(query.fri6 ?? 'A').toUpperCase();
+        if (!['A', 'B'].includes(fri6)) return null;
+        options.fri6 = fri6 as 'A' | 'B';
     }
 
-    if (query.eb !== undefined) {
-        const eb = String(query.eb).toLowerCase();
-        if (!['0', '1', 'true', 'false'].includes(eb)) return null;
-        options.eb = eb === '1' || eb === 'true';
-    }
+    const eb = String(query.eb).toLowerCase();
+    if (!['0', '1', 'true', 'false'].includes(eb)) return null;
+    options.eb = eb === '1' || eb === 'true';
 
-    if (query.sc !== undefined) {
-        const sc = String(query.sc).toLowerCase();
-        if (!['0', '1', 'true', 'false'].includes(sc)) return null;
-        options.sc = sc === '1' || sc === 'true';
-    }
+    const sc = String(query.sc).toLowerCase();
+    if (!['0', '1', 'true', 'false'].includes(sc)) return null;
+    options.sc = sc === '1' || sc === 'true';
 
     return options;
 }
